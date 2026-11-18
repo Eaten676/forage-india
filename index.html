@@ -207,6 +207,8 @@ main{padding-block:16px 56px}
 .dish-f .uses{display:flex;flex-wrap:wrap;gap:4px}
 .dish-f .uses button{font-size:.75rem;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:1px 9px;cursor:pointer}
 .fav{font-family:var(--body);font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--turmeric);vertical-align:middle;margin-left:4px;white-space:nowrap}
+.more{display:block;margin:14px auto 0;border:1px solid var(--line);background:var(--surface);color:var(--fg);border-radius:999px;padding:8px 18px;font-weight:700;font-size:.88rem;cursor:pointer}
+.more:hover{border-color:var(--fg)}
 .ytlink{font-size:.82rem;font-weight:700;color:var(--fg);text-decoration:none;white-space:nowrap}
 .ytlink:hover{text-decoration:underline}
 .thumbs{display:flex;gap:6px;margin-top:8px}
@@ -742,13 +744,13 @@ function menuItem(r){const u=rUntil(r);
   const dp=DISHPICS[dishSlug(r.n)];
   return `<article class="dish${isHome(r)?" home":""}${dp?" has-pic":""}">${dp?`<img class="dishpic" src="img/dish_${dishSlug(r.n)}.webp" alt="${esc(r.n)}" loading="lazy">`:""}<div class="dish-body"><div class="dish-h"><h4>${esc(r.n)}${isHome(r)?` <span class="fav">Local favourite</span>`:""}</h4><span class="pill ${u===0?"now":"later"}">${u===0?"In season":u<99?"From "+MONTHS[mAt(u)-1]:"Other regions"}</span></div>
   <p>${esc(r.d)}</p>${r.w?`<div class="warnline">${esc(r.w)}</div>`:""}
-  <div class="dish-f"><span class="uses">${rPlants(r).map(p=>`<button data-open="${p.id}">${esc(p.name)}</button>`).join("")}</span><a class="ytlink" href="${ytURL(r.yt)}" target="_blank" rel="noopener">▶ Recipe video</a></div>${dp?`<div class="dishcred">Photo: ${esc(dp.a)} · ${esc(dp.l)} · <a href="${esc(dp.s)}" target="_blank" rel="noopener">source</a></div>`:""}</div></article>`}
+  <div class="dish-f"><span class="uses">${rPlants(r).slice(0,2).map(p=>`<button data-open="${p.id}">${esc(p.name)}</button>`).join("")}</span><a class="ytlink" href="${ytURL(r.yt)}" target="_blank" rel="noopener">▶ Recipe video</a></div>${dp?`<div class="dishcred">Photo: ${esc(dp.a)} · ${esc(dp.l)} · <a href="${esc(dp.s)}" target="_blank" rel="noopener">source</a></div>`:""}</div></article>`}
 let courseObs;
 function watchCourses(){if(courseObs)courseObs.disconnect();if(!("IntersectionObserver" in window))return;
  courseObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const k=e.target.id.replace("course-","");document.querySelectorAll(".course-nav a").forEach(a=>{const on=a.dataset.jump===k;a.classList.toggle("on",on);if(on)a.scrollIntoView({block:"nearest",inline:"nearest"})})}})},{rootMargin:"-130px 0px -60% 0px"});
  document.querySelectorAll(".course").forEach(c=>courseObs.observe(c))}
 function renderMenu(){
-  const scope=state.menu||"local";
+  const scope=state.menu||"now"; state.open=state.open||{};
   const pick=r=>scope==="all"?true:scope==="now"?rUntil(r)===0:rUntil(r)<99;
   const list=R.filter(pick);
   const nowN=R.filter(r=>rUntil(r)===0).length, locN=R.filter(r=>rUntil(r)<99).length;
@@ -760,7 +762,7 @@ function renderMenu(){
   </div>
   <nav class="course-nav">${COURSES.map(([k,v])=>`<a href="#menu" data-jump="${k}">${v}</a>`).join("")}</nav>
   ${COURSES.map(([k,v])=>{const items=list.filter(r=>r.c===k).sort((a,b)=>(homeScore(b)-homeScore(a))||(rUntil(a)===0?0:1)-(rUntil(b)===0?0:1)||rUntil(a)-rUntil(b)||a.n.localeCompare(b.n));
-    return `<section class="course" id="course-${k}"><h3><span>${v}</span></h3>${items.length?`<div class="dishes">${items.map(menuItem).join("")}</div>`:`<div class="empty">Nothing on this course ${scope==="now"?"this month":"for your region"}. Try <b>All India</b>.</div>`}</section>`}).join("")}`;
+    return `<section class="course" id="course-${k}"><h3><span>${v}</span></h3>${items.length?`<div class="dishes">${(state.open[k]?items:items.slice(0,5)).map(menuItem).join("")}</div>${items.length>5?`<button class="more" data-more="${k}">${state.open[k]?"Show fewer":`Show all ${items.length}`}</button>`:""}`:`<div class="empty">Nothing on this course ${scope==="now"?"this month":"for your region"}. Try ${scope==="now"?"<b>My region</b>":"<b>All India</b>"}.</div>`}</section>`}).join("")}`;
   watchCourses();
 }
 
@@ -832,6 +834,7 @@ document.addEventListener("click",e=>{
   const o=e.target.closest("[data-open]");if(o){openSheet(o.dataset.open);return}
   const t=e.target.closest("[data-type]");if(t){state.type=t.dataset.type;renderNearList();return}
   const m=e.target.closest("[data-mode]");if(m){state.mode=m.dataset.mode;renderNearList();return}
+  const mo=e.target.closest("[data-more]");if(mo){state.open=state.open||{};const k=mo.dataset.more;state.open[k]=!state.open[k];const y=document.getElementById("course-"+k).getBoundingClientRect().top;renderMenu();if(!state.open[k])document.getElementById("course-"+k).scrollIntoView({block:"start"});return}
   const mm=e.target.closest("[data-menu]");if(mm){state.menu=mm.dataset.menu;renderMenu();return}
   const jp=e.target.closest("[data-jump]");if(jp){e.preventDefault();document.getElementById("course-"+jp.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
   const n=e.target.closest("[data-nutr]");if(n){state.nutr=n.dataset.nutr;renderNutrition()}
