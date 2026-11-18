@@ -3,17 +3,27 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Wild food across India by state and season: what to pick, how to harvest it, what to cook, and what to avoid.">
+<title>Forage India: wild food near you, by state and season</title>
+<meta name="description" content="Free guide to wild food across India. See which wild greens, fruit, roots and nuts are in season in your state this month, how to harvest them safely, and 124 dishes to cook.">
+<link rel="canonical" href="https://eaten676.github.io/forage-india/">
+<meta name="google" content="notranslate">
 <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" href="icons/favicon.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta property="og:title" content="Forage India">
-<meta property="og:description" content="What's wild near you this month, how to harvest it, and what to cook with it.">
-<meta property="og:image" content="img/moringa.webp">
-<title>Forage India</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Forage India">
+<meta property="og:title" content="Forage India: what's wild near you this month">
+<meta property="og:description" content="Wild food across India by state and season: what to pick, how to harvest it, and what to cook with it.">
+<meta property="og:url" content="https://eaten676.github.io/forage-india/">
+<meta property="og:image" content="https://eaten676.github.io/forage-india/og/home.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Forage India: what's wild near you this month">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "name": "Forage India", "url": "https://eaten676.github.io/forage-india/", "inLanguage": "en-IN", "description": "Wild food across India by state and season."}, {"@type": "WebApplication", "name": "Forage India", "url": "https://eaten676.github.io/forage-india/", "applicationCategory": "EducationalApplication", "operatingSystem": "Any (web, installable)", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "INR"}, "image": "https://eaten676.github.io/forage-india/og/home.jpg", "description": "Pick your state and month to see which of 100 wild foods are in season, how to recognise and harvest them, which lookalikes to avoid, and 124 dishes to cook."}]}</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
 <style>
 html{color-scheme:light}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}
@@ -295,6 +305,7 @@ main{padding-block:16px 56px}
 .sheet .hero{padding:0;max-width:none}
 .vbox .vframe{display:block;width:100%;aspect-ratio:16/9;border:0;background:#000;border-radius:10px}
 .dimg.ing::after{display:none}
+.btn.share svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;margin-right:6px;vertical-align:-3px}
 
 .noimg{display:grid;place-items:center;width:100%;height:100%;font-family:var(--display);font-size:3rem;font-weight:700;color:var(--green);background:var(--green-soft)}
 .favtag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px}
@@ -325,7 +336,7 @@ footer{color:var(--muted);font-size:.85rem;padding-block:24px;border-top:1px sol
   <section id="v-safety" hidden></section>
   <div id="tip-root"></div>
 </main>
-<footer class="wrap">Seasons and ranges are approximate and shift with rainfall and altitude. Identify every plant with an experienced local before eating it. Photos come from Wikimedia Commons under free licences, with credits under each one.</footer>
+<footer class="wrap">Seasons and ranges are approximate and shift with rainfall and altitude. Identify every plant with an experienced local before eating it. Photos come from Wikimedia Commons under free licences, with credits under each one.<br><a href="https://eaten676.github.io/forage-india/plants/">All wild plants</a> · <a href="https://eaten676.github.io/forage-india/dishes/">All dishes</a></footer>
 <div id="sheet-root"></div>
 
 <script>
@@ -839,14 +850,14 @@ function openDish(i){const r=R[i];if(!r)return;const im=dishImg(r),sl=dishSlug(r
    ${yv?`<figure class="hero vbox"><button class="vplay" id="vplay" aria-label="Play the ${esc(r.n)} recipe video"><img class="heroimg" src="https://i.ytimg.com/vi/${yv.id}/hqdefault.jpg" alt="" data-fb="${ingImg(r)}" onerror="imgFail(this)"><span class="pbadge" aria-hidden="true"></span></button>
      <figcaption>Video: <a href="https://www.youtube.com/watch?v=${yv.id}" target="_blank" rel="noopener">${esc(yv.ch)}</a> on YouTube</figcaption></figure>`
     :(!dp&&im?`<figure class="hero"><img class="heroimg" src="${im.src}" alt="${esc(r.n)}"><figcaption>Shown: the wild ingredient</figcaption></figure>`:"")}
-   <div class="photo-links"><a class="btn primary" href="${yv?`https://www.youtube.com/watch?v=${yv.id}`:ytURL(r.yt)}" target="_blank" rel="noopener">▶ ${yv?"Watch on YouTube":"Find a recipe video"}</a></div>
+   <div class="photo-links"><a class="btn primary" href="${yv?`https://www.youtube.com/watch?v=${yv.id}`:ytURL(r.yt)}" target="_blank" rel="noopener">▶ ${yv?"Watch on YouTube":"Find a recipe video"}</a>${waShare(r.n+": a wild food recipe from Forage India",`dishes/${sl}/`)}</div>
    <div class="facts">
     ${r.w?`<div class="callout"><b>Note.</b> ${esc(r.w)}</div>`:""}
     <div><h4>How to make it</h4><p>${esc(r.d)}</p></div>
     <div><h4>Season</h4><p>${seasonTxt(r)}</p></div>
     <div><h4>Wild ingredients</h4><div class="uses" style="display:flex;flex-wrap:wrap;gap:6px">${rPlants(r).map(p=>`<button class="chip" data-open="${p.id}">${esc(p.name)}</button>`).join("")}</div></div>
    </div></div></div>`;
-  const close=()=>{$("#sheet-root").innerHTML="";document.removeEventListener("keydown",k)};const k=e=>{if(e.key==="Escape")close()};
+  const close=()=>{$("#sheet-root").innerHTML="";document.removeEventListener("keydown",k);clearDeep()};const k=e=>{if(e.key==="Escape")close()};
   $("#sclose").onclick=close;$("#sbg").onclick=e=>{if(e.target.id==="sbg")close()};document.addEventListener("keydown",k);$("#sclose").focus();
   const vp=$("#vplay");if(vp)vp.onclick=()=>{const f=document.createElement("iframe");f.src=`https://www.youtube-nocookie.com/embed/${yv.id}?autoplay=1&rel=0`;f.title=r.n+" recipe video";f.allow="autoplay; encrypted-media; picture-in-picture; fullscreen";f.allowFullscreen=true;f.className="vframe";vp.replaceWith(f)};
 }
@@ -893,7 +904,7 @@ function openSheet(id){
   $("#sheet-root").innerHTML=`<div class="sheet-bg" id="sbg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
    <header><div>${tag(p)}<h2 id="sh-t" style="margin-top:8px">${esc(p.name)}</h2><div class="sci">${esc(p.sci)}</div><div class="local" style="color:var(--muted)">${esc(p.local)}</div></div><button class="close" id="sclose" aria-label="Close">✕</button></header>
    ${galleryHTML(p)}
-   <div class="photo-links">${CREDITS[p.id]?"":`<a class="btn ghost" href="${photoURL(p)}" target="_blank" rel="noopener">See photos</a>`}<a class="btn primary" href="${ytURL("how to harvest "+p.name+" "+p.local.split(" · ")[0])}" target="_blank" rel="noopener">Watch how to harvest</a><a class="btn primary" href="${ytURL(YT[p.id]||p.name+" recipe")}" target="_blank" rel="noopener">Watch how to prepare</a><a class="btn ghost" href="${wikiURL(p)}" target="_blank" rel="noopener">Read on Wikipedia</a></div>
+   <div class="photo-links">${CREDITS[p.id]?"":`<a class="btn ghost" href="${photoURL(p)}" target="_blank" rel="noopener">See photos</a>`}<a class="btn primary" href="${ytURL("how to harvest "+p.name+" "+p.local.split(" · ")[0])}" target="_blank" rel="noopener">Watch how to harvest</a><a class="btn primary" href="${ytURL(YT[p.id]||p.name+" recipe")}" target="_blank" rel="noopener">Watch how to prepare</a><a class="btn ghost" href="${wikiURL(p)}" target="_blank" rel="noopener">Read on Wikipedia</a>${waShare(p.name+": when it's in season, how to pick it and what to cook",`plants/${p.id}/`)}</div>
    <div class="facts">
     ${p.warn?`<div class="callout"><b>Caution.</b> ${esc(p.warn)}</div>`:""}
     ${lookFor(p).map(l=>lookBlock(p,l)).join("")}
@@ -903,23 +914,28 @@ function openSheet(id){
     ${p.nutr.length?`<div><h4>Good for</h4><p>${p.nutr.map(k=>NUTR[k].name).join(" · ")}</p></div>`:""}
     <div><h4>How to harvest</h4><p>${esc(harvestText(p))}</p></div>
     <div><h4>How to eat it</h4><p>${esc(p.eat)}</p></div>
-    ${(()=>{const rs=R.filter(r=>r.u.includes(p.id));return rs.length?`<div><h4>On the menu</h4><p>${rs.map(r=>`<b>${esc(r.n)}</b> · <a href="${ytURL(r.yt)}" target="_blank" rel="noopener">video</a>`).join("<br>")}</p></div>`:""})()}
+    ${(()=>{const rs=R.filter(r=>r.u.includes(p.id));return rs.length?`<div><h4>On the menu</h4><p>${rs.map(r=>`<b>${esc(r.n)}</b> · <a href="${YTV[dishSlug(r.n)]?"https://www.youtube.com/watch?v="+YTV[dishSlug(r.n)].id:ytURL(r.yt)}" target="_blank" rel="noopener">video</a>`).join("<br>")}</p></div>`:""})()}
     <div><h4>How to store it</h4><p>${esc(p.store)}</p></div>
    </div></div></div>`;
-  const close=()=>{$("#sheet-root").innerHTML="";document.removeEventListener("keydown",esc_)};
+  const close=()=>{$("#sheet-root").innerHTML="";document.removeEventListener("keydown",esc_);clearDeep()};
   const esc_=e=>{if(e.key==="Escape")close()};
   $("#sclose").onclick=close;$("#sbg").onclick=e=>{if(e.target.id==="sbg")close()};
   document.addEventListener("keydown",esc_);$("#sclose").focus();
 }
 
+const SITE="https://eaten676.github.io/forage-india/";
+const waShare=(title,path)=>`<a class="btn ghost share" href="https://wa.me/?text=${encodeURIComponent(title+"\n"+SITE+path)}" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 18.7z"/></svg>Share on WhatsApp</a>`;
+const clearDeep=()=>{if(/^#[pd]\//.test(location.hash))history.replaceState(null,"",location.pathname+location.search)};
 const VIEWS=["home","near","menu","nutrition","safety"];
 function route(){
-  const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):"home";
+  const h=location.hash.slice(1),deep=/^[pd]\//.test(h)?h:"";
+  const v=VIEWS.includes(h)?h:"home";
   $("#sheet-root").innerHTML="";
   const was=VIEWS.find(x=>!$("#v-"+x).hidden);
   VIEWS.forEach(x=>{$("#v-"+x).hidden=x!==v});
   if(was&&was!==v)window.scrollTo({top:0});
   document.querySelectorAll("nav.tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+v?"page":"false"));
+  if(deep){const id=decodeURIComponent(deep.slice(2));if(deep[0]==="p")openSheet(id);else{const i=R.findIndex(r=>dishSlug(r.n)===id);if(i>=0)openDish(i)}}
 }
 document.querySelector("a.brand").addEventListener("click",e=>{e.preventDefault();if(location.hash)history.pushState(null,"",location.pathname+location.search);route()});
 addEventListener("popstate",route);
