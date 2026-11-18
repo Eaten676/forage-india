@@ -640,7 +640,7 @@ function fundHTML(){
  return `<section class="tip" id="tip" aria-labelledby="tip-h">
   <div class="tip-copy">
    <h2 id="tip-h">Feed the forager</h2>
-   <p>Found something tasty? Send a little back, if you feel like it.</p>
+   <p>Found something tasty? Buy the forager a snack.</p>
    ${TIP.upiId?`<a class="btn primary" href="upi://pay?pa=${TIP.upiId}&pn=${encodeURIComponent(TIP.payee)}&cu=INR&tn=${encodeURIComponent("Feed the forager")}">Pay with a UPI app</a>`:""}
    ${TIP.upiId?`<div class="upi-id"><code id="upi">${esc(TIP.upiId)}</code><button class="chip" id="copyupi">Copy UPI ID</button></div>`:""}
   </div>
