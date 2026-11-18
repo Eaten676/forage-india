@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Wild food across India by state and season: what to pick, how to harvest it, what to cook, and what to avoid.">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1a1a1a" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta property="og:title" content="Forage India">
+<meta property="og:description" content="What's wild near you this month, how to harvest it, and what to cook with it.">
+<meta property="og:image" content="img/moringa.webp">
+<title>Forage India</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+html{color-scheme:light}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}
+/* Layout: a field app — sticky locale bar, tabbed views, card grid, bottom-sheet detail */
+:root{
+  --bg:#ffffff; --surface:#ffffff; --sunk:#f2f2f0; --fg:#171717; --muted:#64645f; --line:#e4e4e0;
+  --leaf:#171717; --leaf-soft:#f2f2f0; --green:#2f6b3a; --green-soft:#e3efe1; --turmeric:#c98a07; --turmeric-soft:#f6e7c0;
+  --earth:#8a5a2b; --earth-soft:#efe0cf; --river:#2a6a8a; --river-soft:#d8e8f0;
+  --mahua:#7a4b84; --mahua-soft:#ece0ef; --danger:#a8321f; --danger-soft:#f6dcd6;
+  --display:"Bricolage Grotesque", "Avenir Next", system-ui, sans-serif;
+  --body:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111111; --surface:#1a1a1a; --sunk:#262626; --fg:#f2f2f2; --muted:#a3a3a3; --line:#333333;
+  --leaf:#ffffff; --leaf-soft:#2a2a2a; --green:#7cc28a; --green-soft:#1f3524; --turmeric:#e8b445; --turmeric-soft:#3a2f14;
+  --earth:#d3a273; --earth-soft:#35281b; --river:#79b6d4; --river-soft:#17303c;
+  --mahua:#c99ad3; --mahua-soft:#33243a; --danger:#f08a76; --danger-soft:#3c1d17; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111111; --surface:#1a1a1a; --sunk:#262626; --fg:#f2f2f2; --muted:#a3a3a3; --line:#333333;
+  --leaf:#ffffff; --leaf-soft:#2a2a2a; --green:#7cc28a; --green-soft:#1f3524; --turmeric:#e8b445; --turmeric-soft:#3a2f14;
+  --earth:#d3a273; --earth-soft:#35281b; --river:#79b6d4; --river-soft:#17303c;
+  --mahua:#c99ad3; --mahua-soft:#33243a; --danger:#f08a76; --danger-soft:#3c1d17; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.5}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.wrap{max-width:1080px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);text-wrap:balance;margin:0}
+a{color:var(--leaf)}
+button,select,input{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--turmeric);outline-offset:2px}
+
+header.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--surface);border-bottom:1px solid var(--line)}
+.bar-row{display:flex;align-items:center;gap:12px;padding-block:10px;min-height:60px}
+.brand{display:flex;align-items:center;gap:8px;text-decoration:none;color:var(--fg);flex:none}
+.brand h1{font-size:1.25rem;font-weight:700;letter-spacing:-.015em;white-space:nowrap}
+.logo{display:block;width:34px;height:34px;flex:none}
+.logo img{display:block;width:100%;height:100%}
+.brand h1 span{color:var(--green);font-weight:500}
+.locale{display:flex;gap:6px;margin-left:auto;min-width:0}
+.locale select{background:var(--sunk);border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:.9rem;color:var(--fg);min-width:0}
+#state{max-width:170px} #month{width:72px}
+nav.tabs{display:flex;gap:2px;margin-left:18px}
+nav.tabs a{display:flex;align-items:center;gap:6px;text-decoration:none;color:var(--muted);padding:7px 12px;border-radius:999px;font-weight:700;font-size:.9rem}
+nav.tabs svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none}
+nav.tabs a[aria-current="page"]{background:var(--fg);color:var(--bg)}
+nav.tabs a:not([aria-current="page"]):hover{color:var(--fg);background:var(--sunk)}
+@media (max-width:820px){
+ .brand h1{font-size:1.1rem}
+ nav.tabs{position:fixed;left:0;right:0;bottom:0;z-index:7;margin:0;justify-content:space-around;gap:0;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:6px max(8px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(8px,env(safe-area-inset-left,0px))}
+ nav.tabs a{flex-direction:column;gap:2px;font-size:.7rem;padding:6px 4px;border-radius:12px;flex:1;max-width:110px;text-align:center}
+ nav.tabs svg{width:22px;height:22px}
+ nav.tabs a[aria-current="page"]{background:var(--sunk);color:var(--fg)}
+ main{padding-bottom:96px!important} footer{padding-bottom:110px!important}
+}
+@media (max-width:400px){.brand h1{display:none}}
+main{padding-block:16px 56px}
+.intro{margin-bottom:12px}
+.intro .stat{margin:4px 0 0;color:var(--muted);font-size:.95rem} .intro .stat b{color:var(--fg);font-variant-numeric:tabular-nums}
+.toolbar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:4;background:var(--bg);padding:8px 0 6px;margin:0 0 12px;border-bottom:1px solid var(--line)}
+.searchrow{display:flex;gap:8px}
+.searchrow .search{flex:1}
+.chiprow{display:flex;gap:6px;align-items:center;overflow-x:auto;scrollbar-width:none;padding:8px 0 2px;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)))}
+.chiprow::-webkit-scrollbar{display:none}
+.chiprow .chip,.chiprow .seg{flex:none;white-space:nowrap}
+.vr{flex:none;width:1px;height:22px;background:var(--line)}
+.count{font-size:.78rem;color:var(--muted);padding-top:4px}
+.intro h2{font-size:clamp(1.45rem,4vw,2.1rem);line-height:1.1;letter-spacing:-.015em}
+.intro p{margin:6px 0 0;color:var(--muted);max-width:62ch}
+.tally{font-family:var(--display);text-align:right}
+.tally b{display:block;font-size:2.4rem;line-height:1;color:var(--leaf);font-variant-numeric:tabular-nums}
+.tally small{color:var(--muted);font-family:var(--body);font-size:.8rem}
+@media (max-width:560px){.intro{grid-template-columns:1fr}.tally{text-align:left}}
+
+.controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:16px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:.88rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:6px 12px;font-size:.88rem;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--leaf);color:var(--surface)}
+.search{flex:1 1 180px;min-width:0;border:1px solid var(--line);background:var(--sunk);border-radius:999px;padding:8px 14px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.card{display:flex;flex-direction:column;gap:8px;text-align:left;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;cursor:pointer;min-width:0}
+.card:hover{border-color:var(--muted)}
+.card{overflow:hidden}
+.thumb{display:block;width:calc(100% + 28px);max-width:none;margin:-14px -14px 4px;aspect-ratio:4/3;object-fit:cover;background:var(--sunk)}
+.hero{margin:14px 0 0}
+.heroimg{display:block;width:100%;max-height:52vh;object-fit:cover;border-radius:10px;background:var(--sunk)}
+.hero figcaption{font-size:.75rem;color:var(--muted);margin-top:6px}
+.hero figcaption a{color:var(--muted)}
+.card .top{display:flex;justify-content:space-between;gap:8px;align-items:start}
+.card h3{font-size:1.1rem;line-height:1.2}
+.card .local{color:var(--muted);font-size:.85rem}
+@media (max-width:600px){
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+ .card{padding:10px;gap:5px;border-radius:12px}
+ .thumb{width:calc(100% + 20px);margin:-10px -10px 2px}
+ .card h3{font-size:.98rem}
+ .card .local{font-size:.75rem;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden}
+ .card .top{flex-direction:column;gap:4px}
+ .card .tag{font-size:.6rem;padding:2px 6px}
+ .card p{display:none}
+ .card .avail{font-size:.72rem}
+ .card .warnline{font-size:.7rem}
+ .months span{font-size:.5rem;padding:2px 0}
+}
+.card p{margin:0;font-size:.92rem}
+.tag{flex:none;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:3px 8px;border-radius:6px}
+.t-green{background:var(--green-soft);color:var(--green)} .t-fruit{background:var(--turmeric-soft);color:var(--turmeric)}
+.t-grain{background:var(--turmeric-soft);color:var(--earth)} .t-starch{background:var(--earth-soft);color:var(--earth)} .t-root{background:var(--earth-soft);color:var(--earth)}
+.avail{font-size:.8rem;font-weight:700;color:var(--muted)} .avail.now{color:var(--fg)}
+.sortsel{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 10px;font-size:.88rem}
+.drink .uses{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.drink .uses button{font-size:.8rem;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:2px 10px;cursor:pointer}
+.drink p{margin:6px 0}
+.drink .pill{align-self:flex-start;white-space:nowrap;padding:3px 10px;line-height:1.3}
+.drink .warnline{margin:4px 0} .t-protein{background:var(--river-soft);color:var(--river)}
+.t-nut{background:var(--earth-soft);color:var(--earth)} .t-flower{background:var(--mahua-soft);color:var(--mahua)}
+.warnline{color:var(--danger);font-size:.82rem;font-weight:700}
+
+.months{display:grid;grid-template-columns:repeat(12,1fr);gap:2px;margin-top:auto}
+.months span{font-size:.6rem;text-align:center;padding:3px 0;border-radius:3px;background:var(--sunk);color:var(--muted);font-variant-numeric:tabular-nums}
+.months span.on{background:var(--leaf);color:var(--surface);font-weight:700}
+.months span.now{box-shadow:inset 0 0 0 2px var(--turmeric)}
+.empty{padding:24px;border:1px dashed var(--line);border-radius:12px;color:var(--muted);text-align:center}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px}
+.panel h3{font-size:1.15rem;margin-bottom:6px}
+.panel p{margin:0 0 8px;max-width:68ch}
+.nutri-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:16px}
+.nutri-pick button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;cursor:pointer}
+.nutri-pick button b{display:block;font-family:var(--display);font-size:1rem}
+.nutri-pick button small{color:var(--muted)}
+.nutri-pick button[aria-pressed="true"]{border-color:var(--leaf);box-shadow:inset 0 0 0 1px var(--leaf);background:var(--leaf-soft)}
+.reality{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:16px}
+.reality .panel b.big{font-family:var(--display);font-size:1.6rem;color:var(--leaf);display:block;line-height:1.1}
+.list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.row{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);cursor:pointer;text-align:left;width:100%}
+.row .why{color:var(--muted);font-size:.86rem}
+.pill{flex:none;font-size:.72rem;font-weight:700;padding:2px 8px;border-radius:999px}
+.pill.now{background:var(--leaf);color:var(--surface)} .pill.later{background:var(--sunk);color:var(--muted)}
+.section-h{font-size:1.2rem;margin:22px 0 10px}
+
+.methods{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.method ol{margin:8px 0;padding-left:20px} .method li{margin-bottom:4px}
+.method .keeps{font-size:.85rem;color:var(--muted)}
+.method .uses{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.method .uses button{font-size:.8rem;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:2px 10px;cursor:pointer}
+
+.danger-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.danger{border-color:var(--danger);background:var(--danger-soft)}
+.danger h3{color:var(--danger)}
+.rules{counter-reset:r;list-style:none;padding:0;margin:0;display:grid;gap:8px}
+.rules li{counter-increment:r;display:grid;grid-template-columns:2rem 1fr;gap:8px;align-items:start}
+.rules li::before{content:counter(r);font-family:var(--display);font-weight:700;color:var(--leaf);font-size:1.3rem;line-height:1.2}
+
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:min(720px,100%);max-height:88vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:20px max(20px,env(safe-area-inset-left,0px)) calc(24px + env(safe-area-inset-bottom,0px))}
+@media (min-width:760px){.sheet-bg{align-items:center}.sheet{border-radius:16px}}
+.sheet header{display:flex;justify-content:space-between;gap:12px;align-items:start;position:sticky;top:-20px;z-index:2;background:var(--surface);margin:-20px -4px 0;padding:20px 4px 10px}
+.sheet::before{content:"";display:block;width:40px;height:4px;border-radius:4px;background:var(--line);margin:-8px auto 12px}
+@media (min-width:760px){.sheet::before{display:none}}
+.sheet h2{font-size:1.7rem;line-height:1.1}
+.sheet .sci{font-style:italic;color:var(--muted)}
+.close{border:1px solid var(--line);background:var(--bg);border-radius:999px;width:36px;height:36px;cursor:pointer;font-size:1.1rem;flex:none}
+.facts{display:grid;gap:14px;margin-top:16px}
+.facts h4{margin:0 0 4px;font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.facts p{margin:0}
+.photo-links{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.btn{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:8px 14px;font-weight:700;text-decoration:none;border:1px solid var(--leaf)}
+.btn.primary{background:var(--leaf);color:var(--surface)} .btn.ghost{color:var(--leaf)}
+.callout{border-left:4px solid var(--danger);background:var(--danger-soft);padding:10px 12px;border-radius:0 8px 8px 0}
+.menu-head{text-align:center;max-width:640px;margin:8px auto 18px}
+.menu-head .eyebrow{font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.menu-head h2{font-size:clamp(1.8rem,5vw,2.6rem);letter-spacing:-.02em;margin:6px 0}
+.menu-head p{color:var(--muted);margin:0}
+.course-nav{position:sticky;top:calc(env(safe-area-inset-top,0px) + 60px);z-index:4;background:var(--bg);display:flex;gap:6px;overflow-x:auto;padding:8px 0;margin-bottom:8px;scrollbar-width:none;border-bottom:1px solid var(--line)}
+.course-nav::-webkit-scrollbar{display:none}
+.course-nav a.on{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.course-nav a{flex:none;font-size:.85rem;text-decoration:none;color:var(--fg);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.course{scroll-margin-top:120px;margin-top:22px}
+.course h3{display:flex;align-items:center;gap:14px;font-size:1.05rem;letter-spacing:.14em;text-transform:uppercase;margin-bottom:12px}
+.course h3::before,.course h3::after{content:"";flex:1;height:1px;background:var(--line)}
+.dishes{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:4px 28px}
+.dish{padding:12px 0;border-bottom:1px dashed var(--line);min-width:0}
+.dish-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.dish h4{font-family:var(--display);font-size:1.12rem;margin:0}
+.dish p{margin:4px 0 6px;font-size:.93rem;color:var(--muted)}
+.dish .pill{white-space:nowrap}
+.dish-f{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px}
+.dish-f .uses{display:flex;flex-wrap:wrap;gap:4px}
+.dish-f .uses button{font-size:.75rem;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:1px 9px;cursor:pointer}
+.fav{font-family:var(--body);font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--turmeric);vertical-align:middle;margin-left:4px;white-space:nowrap}
+.ytlink{font-size:.82rem;font-weight:700;color:var(--fg);text-decoration:none;white-space:nowrap}
+.ytlink:hover{text-decoration:underline}
+.thumbs{display:flex;gap:6px;margin-top:8px}
+.tb{border:2px solid transparent;padding:0;border-radius:8px;overflow:hidden;width:64px;height:48px;background:var(--sunk);cursor:pointer}
+.tb.on{border-color:var(--fg)} .tb img{width:100%;height:100%;object-fit:cover;display:block}
+.lookalike{border:1px solid var(--danger);background:var(--danger-soft);border-radius:12px;padding:12px}
+.lk-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lk-head h4{margin:0;font-size:1rem;color:var(--danger);text-transform:none;letter-spacing:0}
+.sev{font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;background:var(--danger);color:var(--surface);border-radius:6px;padding:2px 7px}
+.lk-sci{font-size:.82rem;color:var(--muted);font-style:italic;margin:2px 0 8px}
+.lk-pics{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lk-fig{margin:0;min-width:0} .lk-fig img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;display:block;background:var(--sunk)}
+.lk-fig figcaption{font-size:.7rem;color:var(--muted);margin-top:4px;line-height:1.35} .lk-fig figcaption a{color:var(--muted)}
+.lk-fig .good{color:var(--green);font-size:.8rem} .lk-fig .bad{color:var(--danger);font-size:.8rem}
+.lookalike ul{margin:10px 0 0;padding-left:18px;font-size:.9rem} .lookalike li{margin-bottom:4px}
+.lk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.lk-grid .panel{padding:10px}
+.dish.has-pic{display:grid;grid-template-columns:88px minmax(0,1fr);gap:12px;align-items:start}
+.dish-body{min-width:0}
+.dishpic{width:88px;height:88px;object-fit:cover;border-radius:10px;background:var(--sunk)}
+.dishcred{font-size:.66rem;color:var(--muted);margin-top:4px} .dishcred a{color:var(--muted)}
+.tip{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(0,1fr);gap:24px;align-items:center;margin-top:40px;padding:24px;border-radius:18px;background:var(--green-soft);border:1px solid var(--line)}
+.tip .eyebrow{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--green)}
+.tip h2{font-size:clamp(1.6rem,4.5vw,2.3rem);letter-spacing:-.02em;line-height:1.05;margin:6px 0 10px}
+.tip p{margin:0 0 16px;max-width:52ch}
+.tip-amts{display:flex;flex-wrap:wrap;gap:6px}
+.tip-amts .chip{text-decoration:none;color:var(--fg);background:var(--surface);cursor:default}
+.tip-amts a.chip{cursor:pointer} .tip-amts a.chip:hover{border-color:var(--fg)}
+.tip-qr{display:flex;flex-direction:column;align-items:center;gap:8px;background:var(--surface);border-radius:14px;padding:18px;text-align:center;border:1px solid var(--line)}
+.qr{width:200px;max-width:100%;aspect-ratio:1;border-radius:10px;background:#fff;object-fit:contain}
+.qr-ph{display:grid;place-items:center;text-align:center;border:2px dashed var(--line);background:var(--sunk);color:var(--muted);font-weight:700;font-size:.9rem}
+.pay-h{font-weight:700} .pay-apps{font-size:.8rem;color:var(--muted)}
+.upi-id{display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:.85rem;margin-top:10px}
+.upi-id code{background:var(--surface);padding:4px 8px;border-radius:6px;user-select:all}
+@media (max-width:700px){.tip{grid-template-columns:1fr;padding:18px}}
+footer{color:var(--muted);font-size:.85rem;padding-block:24px;border-top:1px solid var(--line)}
+@media (prefers-reduced-motion:no-preference){.card,.row,.chip{transition:border-color .15s,background .15s}}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <div class="wrap bar-row">
+    <a class="brand" href="#near"><span class="logo"><img src="img/logo-f.png" alt="" width="34" height="34"></span><h1>Forage <span>India</span></h1></a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#near"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Near you</span></a><a href="#menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18a9 9 0 0 1-18 0z"/><path d="M8 8c0-2 2-2 2-4M12 8c0-2 2-2 2-4M16 8c0-2 2-2 2-4"/></svg><span>Menu</span></a><a href="#nutrition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19C5 10 11 5 20 4c-1 9-6 15-15 15z"/><path d="M5 19l8-8"/></svg><span>Nutrition</span></a><a href="#safety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Stay safe</span></a>
+    </nav>
+    <div class="locale"><select id="state" aria-label="Your state"></select><select id="month" aria-label="Month"></select></div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section id="v-near"></section>
+  <section id="v-nutrition" hidden></section>
+  <section id="v-menu" hidden></section>
+  <section id="v-safety" hidden></section>
+  <div id="tip-root"></div>
+</main>
+<footer class="wrap">Seasons and ranges are approximate and shift with rainfall and altitude. Identify every plant with an experienced local before eating it. Photo links open Wikimedia Commons and Wikipedia, which host freely licensed pictures.</footer>
+<div id="sheet-root"></div>
+
+<script>
+const CREDITS={"moringa": {"a": "Venkatx5", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:DrumstickFlower.jpg"}, "amaranth": {"a": "Joydeep", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Amaranthus_viridis_25042014_1.jpg"}, "bathua": {"a": "Rasbak", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Melganzenvoet_bloeiwijze_Chenopodium_album.jpg"}, "purslane": {"a": "(c) Tyler Ekholm, some rights reserved (CC BY)", "l": "CC BY 4.0", "s": "https://commons.wikimedia.org/wiki/File:Common_Purslane,_United_States_imported_from_iNaturalist_photo_541953905.jpg"}, "woodsorrel": {"a": "Norio Nomura", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Oxalis_corniculata23.jpg"}, "pennywort": {"a": "Shahidul Hasan Roman", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Centella_asiatica_(%E0%A6%A5%E0%A6%BE%E0%A6%A8%E0%A6%95%E0%A7%81%E0%A6%A8%E0%A6%BF)_(3).jpg"}, "curry": {"a": "Rantingsteve at English Wikipedia", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Curry_Trees.jpg"}, "colocasia": {"a": "See source", "l": "CC BY-SA 2.5", "s": "https://commons.wikimedia.org/wiki/File:Songe-R%C3%A9union.JPG"}, "nettle": {"a": "Evelyn Simak", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Fen_nettle_(Urtica_dioica_ssp._galeopsifolia)_-_geograph.org.uk_-_5423125.jpg"}, "fiddlehead": {"a": "Forest & Kim Starr", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Starr_030807-8009_Diplazium_esculentum.jpg"}, "bamboo": {"a": "Haragayato", "l": "CC BY-SA 2.5", "s": "https://commons.wikimedia.org/wiki/File:Bamboo_sprout2.JPG"}, "amla": {"a": "L. Shyamal", "l": "CC BY 2.5", "s": "https://commons.wikimedia.org/wiki/File:Phyllanthus_officinalis.jpg"}, "jamun": {"a": "Ton Rulkens", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Syzygium_cumini_-_fruits.jpg"}, "ber": {"a": "Lokeswaran Kaliyappan", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Ziziphus_mauritiana_-_Jujube.jpg"}, "mango": {"a": "Billjones94", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Mangoes_(Magnifera_indica)_from_India.jpg"}, "jackfruit": {"a": "This work was made by Tushar Hossain and released under the license(s) stated...", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:The_jackfruit_is_holding_on_to_the_tree.jpg"}, "tamarind": {"a": "Salil Kumar Mukherjee", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Tamarind_tree_(Tamarindus_indica)_with_pods.jpg"}, "bael": {"a": "J.M.Garg", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Bael_(Aegle_marmelos)_tree_at_Narendrapur_W_IMG_4116.jpg"}, "fig": {"a": "Vinayaraj", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Ficus_racemosa_fruits_at_Makutta_(1).jpg"}, "karonda": {"a": "Sakurai Midori", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Carissa_carandas_flowers.JPG"}, "kokum": {"a": "Subray Hegde", "l": "CC BY 1.0", "s": "https://commons.wikimedia.org/wiki/File:Garcinia_indica_-_fruits,_seeds,_pulp_and_rinds.jpg"}, "cashew": {"a": "Abhishek Jacob", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Cashew_apples.jpg"}, "palmyra": {"a": "Harshanh", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Borassus_flabellifer_fruit_01.jpg"}, "sangri": {"a": "Editinf", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Prosopis_cineraria_fruit_sangri_collection_at_Arid_forest_research_institute.jpg"}, "ker": {"a": "Forestowlet", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:Capparis_decidua_03.jpg"}, "lasoda": {"a": "Marco Schmidt [1]", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Cordia_myxa_MS_1790.jpg"}, "seabuckthorn": {"a": "See source", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Hippophae_rhamnoides-01_(xndr).JPG"}, "kafal": {"a": "L. Shyamal", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Kaphal.jpg"}, "hisalu": {"a": "pratap baniya", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Shivapuri_-_Ainselu_-_Raspberry_Yellow.jpg"}, "walnut": {"a": "George Chernilevsky", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Juglans_regia_2009_G2.jpg"}, "chironji": {"a": "MGB CEE", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:%E0%A4%9A%E0%A4%BE%E0%A4%B0%E0%A5%8B%E0%A4%B3%E0%A5%80,_%E0%A4%B5%E0%A5%80%E0%A4%B0%E0%A4%AA%E0%A5%81%E0%A4%B0,_%E0%A4%B6%E0%A4%B9%E0%A4%BE%E0%A4%A6%E0%A4%BE,_%E0%A4%A8%E0%A4%82%E0%A4%A6%E0%A5%81%E0%A4%B0%E0%A4%AC%E0%A4%BE%E0%A4%B0_Tendu,_Veerpur,_Shahada,_Nandurbar_(Buchanania_lanzan).jpg"}, "almond": {"a": "Hans Hillewaert", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Terminalia_catappa_(fruit).jpg"}, "mahua": {"a": "SMarndi", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Madhuca_longifolia_5.jpg"}, "yam": {"a": "Remi Tournebize", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Kambar_wh.jpg"}, "singhara": {"a": "Krzysztof Ziarnek, Kenraiz", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Trapa_natans_kz6.JPG"}, "lotus": {"a": "T.Voekler", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Sacred_lotus_Nelumbo_nucifera.jpg"}, "honey": {"a": "Peterwchen", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bidens-Apis_dorsata-pollen_baskets.jpg"}, "shellfish": {"a": "H. Zell", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Meretrix_meretrix_01.jpg"}, "snails": {"a": "Tripathy B, Sajan S, Cowie RH (2019) Illustrated catalogue of types of Ampull...", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:Ampullaria_globosa_var_incrassatula_(10.3897-zse.96.47792)_Figure_5.jpg"}, "honagonne": {"a": "Jeevan Jose, Kerala, India", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Alternanthera_sessilis_in_Kadavoor.jpg"}, "spinyamaranth": {"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Amaranthus.spinosus1web.jpg"}, "basale": {"a": "See source", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Basella_alba-2.JPG"}, "kalmi": {"a": "Eric Guinther", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:N_Ipoa_D1600.JPG"}, "chakoda": {"a": "Francisco Manuel Blanco (O.S.A.)", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Senna_tora_Blanco1.122-cropped.jpg"}, "kantola": {"a": "Sivahari", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Erumapaval.JPG"}, "ivygourd": {"a": "Tauʻolunga", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Coccinia_grandis_fruit.jpg"}, "bananaflower": {"a": "Xufanc", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Kluay_Tani26.JPG"}, "fishwort": {"a": "See source", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Houttuynia_cordata.jpg"}, "culantro": {"a": "See source", "l": "Copyrighted free use", "s": "https://commons.wikimedia.org/wiki/File:Hombay3.jpg"}, "treebean": {"a": "Forest & Kim Starr", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Parkia_timoriana_1.jpg"}, "kachnar": {"a": "Peter1968 at English Wikipedia", "l": "CC BY 2.5", "s": "https://commons.wikimedia.org/wiki/File:Bauhinia_variegata_flower.jpg"}, "agathi": {"a": "Forest & Kim Starr", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Starr_050518-1632_Sesbania_grandiflora.jpg"}, "buransh": {"a": "Ananda Raj Devkota", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Lali_Gurans.JPG"}, "neemflower": {"a": "Gpics at English Wikipedia", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Azadirachta_indica_flowers_in_Guntur.jpg"}, "phog": {"a": "LRBurdak", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Calligonum_polygonoides.JPG"}, "matira": {"a": "Fred Hsu (Wikipedia:User:Fred Hsu on en.wikipedia)", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Taiwan_2009_Tainan_City_Organic_Farm_Watermelon_FRD_7962.jpg"}, "peelu": {"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Salvadora_oleoides_Bra39.png"}, "kumat": {"a": "SAplants", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Senegalia_senegal_var._leiorachis_20D_3958.jpg"}, "kendu": {"a": "Dinesh Valke from Thane, India", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Diospyros_melanoxylon_(8978682629).jpg"}, "kusum": {"a": "Vinayaraj", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Schleichera_oleosa_-_Kusum_Tree_fruits_at_Peravoor_2014_(10).jpg"}, "wilddate": {"a": "AntanO", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Phoenix_sylvestris_(fruit).jpg"}, "grewia": {"a": "Asit K. Ghosh Thaumaturgist", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Phalsa03_Asit.jpg"}, "kaith": {"a": "Vijay Barve", "l": "CC BY 4.0", "s": "https://commons.wikimedia.org/wiki/File:Limonia_acidissima_4614573.jpg"}, "custardapple": {"a": "Muhammad Mahdi Karim", "l": "GFDL 1.2", "s": "https://commons.wikimedia.org/wiki/File:Sugar_apple_on_tree.jpg"}, "guava": {"a": "Ivar Leidus", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Guava_pink_fruit.jpg"}, "monkeyjack": {"a": "iGarn", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Lakoocha_tree.JPEG"}, "kudampuli": {"a": "Vssun at ml.wikipedia", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:%E0%B4%95%E0%B5%81%E0%B4%9F%E0%B4%AA%E0%B5%8D%E0%B4%AA%E0%B5%81%E0%B4%B3%E0%B4%BF.JPG"}, "hogplum": {"a": "Rohit Naniwadekar", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Spondias_pinnata_P1130674_05.jpg"}, "jalebi": {"a": "J.M.Garg", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Tree_I_IMG_2896.jpg"}, "elephantapple": {"a": "Manjur545", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Dillenia_indica,_West_Bengal,_India.jpg"}, "mulberry": {"a": "malenki", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Mulberries_on_tree_1.jpg"}, "mehal": {"a": "Postman, J", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Pyr0589_002_fruit_2005a_(1).jpg"}, "kilmora": {"a": "drawing from the book Handbuch der Laubholzkunde from 1889 by Dr. Leopold Dippel", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Berberis_asiatica_drawing.jpg"}, "timla": {"a": "കാക്കര", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Ficus_auriculata.jpg"}, "ghain": {"a": "KENPEI", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Elaeagnus_umbellata1.jpg"}, "daru": {"a": "Augustus Binu : flickr", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Pomegranate_Juice_(2019).jpg"}, "apricot": {"a": "Fir0002", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Apricots.jpg"}, "chilgoza": {"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Pinus_gerardiana_female_cone.jpg"}, "makhana": {"a": "さかおり", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Junicho-Gata_lagoon_Euryale_feroxe_habitat_07.jpg"}, "bamboorice": {"a": "Dvellakat", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bambusa_bamus.JPG"}, "suran": {"a": "J A Forbes", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Amorphophallus_Paeoniifolius_g.jpg"}, "tikhur": {"a": "Jeevan Jose, Kerala, India", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Indosylvirana_urbis-Kadavoor-2017-05-05-001.jpg"}, "redant": {"a": "Muhammad Mahdi Karim", "l": "GFDL 1.2", "s": "https://commons.wikimedia.org/wiki/File:Red_Weaver_Ant,_Oecophylla_smaragdina.jpg"}, "crab": {"a": "Philipp Weigell", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Potamon_ibericus_(1).JPG"}, "taro": {"a": "See source", "l": "CC BY-SA 2.5", "s": "https://commons.wikimedia.org/wiki/File:Songe-R%C3%A9union.JPG"}, "shatavari": {"a": "Neha.Vindhya", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Asparagus_racemosus.JPG"}, "cane": {"a": "Plague", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bush_of_Calamus_tenuis_4.jpg"}, "palmtuber": {"a": "Lokeswaran Kaliyappan", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Palymyra_in_Tamil_Nadu.jpg"}, "vidari": {"a": "Dinesh Valke from Thane, India", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Pueraria_tuberosa_(Roxb._ex_Willd.)_DC._(6926236863).jpg"}, "jambu": {"a": "Averater", "l": "CC BY 4.0", "s": "https://commons.wikimedia.org/wiki/File:Allium_wallichii_GotBot_2015_004.jpg"}, "wildrice": {"a": "Daderot", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:Oryza_rufipogon_-_National_Taiwan_University_-_DSC01108.JPG"}, "junglerice": {"a": "Tauʻolunga", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Echinochloa_colona.jpg"}, "bhurat": {"a": "Marco Schmidt [1]", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Cenchrus_biflorus_MS6631.jpg"}, "waterlily": {"a": "Nguyễn Tấn Phát", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:South_Vietnam%27s_Water_Lily.JPG"}, "wildmung": {"a": "Ivar Leidus", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Mung_beans_(Vigna_radiata).jpg"}, "ricebean": {"a": "Samuel Wong", "l": "CC BY-SA 2.5", "s": "https://commons.wikimedia.org/wiki/File:%E8%B5%A4%E5%B0%8F%E8%B1%86.jpg"}, "mucuna": {"a": "Agong1", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Mucuna_pruriens_flower.jpg"}, "siali": {"a": "J.M.Garg", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Bauhinia_vahlii_in_Ananthagiri_forest,_AP_W_IMG_9204.jpg"}}/*CREDITS*/;
+const GALLERY={"moringa": [{"a": "Rik Schuiling / TropCrop - Tropical Crops Services, Wageningen", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:2011.06-382-550,551_Drumstick_tree(Moringa_oleifera),lf,e-s_greenhouse_Radix_Serre@Wageningen_University,NL_fri24jun2011.jpg"}, {"a": "Billjones94", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Drumstick_flowers_of_Moringa_oleifera.jpg"}], "bathua": [{"a": "Maksymilian Buś", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Chenopodium_albium_(wild_spinach),_wild_field,_Warsaw,_Poland.jpg"}, {"a": "Rasbak", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Melganzenvoet_bloemen_Chenopodium_album.jpg"}], "purslane": [{"a": "(c) Tyler Ekholm, some rights reserved (CC BY)", "l": "CC BY 4.0", "s": "https://commons.wikimedia.org/wiki/File:Common_Purslane,_United_States_imported_from_iNaturalist_photo_541953735.jpg"}], "pennywort": [{"a": "Azreey", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:A_patch_of_Centella_Asiatica_or_pegaga_in_Malay..jpg"}, {"a": "Kevin Thiele from Perth, Australia", "l": "CC BY 2.0", "s": "https://commons.wikimedia.org/wiki/File:Centella_asiatica_-_Flickr_-_Kevin_Thiele.jpg"}], "curry": [{"a": "M. Chang", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:CurryLeaf_Fruits.jpg"}], "colocasia": [{"a": "Wildfeuer", "l": "CC BY 2.5", "s": "https://commons.wikimedia.org/wiki/File:2006-10-22Colocasia01.jpg"}, {"a": "Irvin Parco Sto. Tomas", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:A_variety_of_taro_plant_at_Mount_Isarog_National_Park.jpg"}], "fiddlehead": [{"a": "L. Shyamal", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:DiplaziumEsculentumCoorg.jpg"}], "bamboo": [{"a": "taketarou（竹太郎）", "l": "CC BY-SA 2.5", "s": "https://commons.wikimedia.org/wiki/File:BambooShoot.JPG"}, {"a": "Gaurav Dhwaj Khadka", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bamboo_Shoot.jpg"}], "amla": [{"a": "Suyash.dwivedi", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Amala_in_Madhya_Pradesh_2.jpg"}], "jamun": [{"a": "Nikitakamka", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Flower_of_Jamblang_(Syzygium_cumini)_01.JPG"}, {"a": "A junaid alam khan (talk)", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Jaam_tree2.JPG"}], "mango": [{"a": "Obsidian Soul", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:Carabao_mangoes_(Philippines).jpg"}, {"a": "Anish nellickal", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Mangifera_indica_2z_.jpg"}], "jackfruit": [{"a": "B.navez", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Artocarpus_heterophylla_flowers.JPG"}, {"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Artocarpus_heterophyllus.jpg"}], "bael": [{"a": "Vijayanrajapuram", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Aegle_marmelos_plant.jpg"}], "fig": [{"a": "Vanitaiitd", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Ficus_racemosa_(Loa_tree).jpg"}, {"a": "Vickey Chauhan", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Indian_Giant_Flying_Squirrel_captured_at_Polo_Forests,_Sabarkantha,_Gujarat_India.jpg"}], "karonda": [{"a": "Salil Kumar Mukherjee", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bengal_currant_(Carissa_carandas)_fruits.jpg"}], "kokum": [{"a": "Phadke09", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Garcinia_indica_fruit.jpg"}], "palmyra": [{"a": "Dinesh Valke from Thane, India", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Borassus_flabellifer_L._(53278558122).jpg"}], "sangri": [{"a": "LRBurdak", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Prosopis_cineraria_-_Khejri.jpg"}], "ker": [{"a": "T. R. Shankar Raman", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Capparis_decidua_DSC0933.jpg"}, {"a": "Munir.7A", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Capparis_decidua_Flower.jpg"}], "lasoda": [{"a": "Rohalamin", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:%D8%AF%D8%B1%D8%AE%D8%AA_%D8%B3%D9%BE%D8%B3%D8%AA%D8%A7%D9%86_%D8%AF%D8%B1_%D8%A2%D8%A8%D9%BE%D8%AE%D8%B4.jpg"}, {"a": "Rohalamin", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:%D9%85%DB%8C%D9%88%D9%87_%D9%86%D8%B1%D8%B3%DB%8C%D8%AF%D9%87_%D8%AF%D8%B1%D8%AE%D8%AA_%D8%B3%D9%BE%D8%B3%D8%AA%D8%A7%D9%86_%D8%AF%D8%B1_%D8%A2%D8%A8%D9%BE%D8%AE%D8%B4.jpg"}], "seabuckthorn": [{"a": "Carl Axel Magnus Lindman", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:243_Hippophae_rhamnoides.jpg"}, {"a": "Michael Hermann", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Seabuckthorn_(Hippophae_rhamonides).jpg"}], "kafal": [{"a": "Kneesknees", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bayberry.jpg"}, {"a": "See source", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:%E0%A4%95%E0%A4%BE%E0%A4%AB%E0%A4%B2.jpg"}], "hisalu": [{"a": "Sarojpandey", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Ainselu_(Golden_Himalayan_Raspberry)_from_Nepal.jpg"}, {"a": "Forest & Kim Starr", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Starr_011205-0067_Rubus_ellipticus.jpg"}], "walnut": [{"a": "AnRo0002", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:20150423Juglans_regia1.jpg"}, {"a": "Krzysztof Golik", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bark_of_Juglans_regia_01.jpg"}], "chironji": [{"a": "Delonix", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Buchanania_cochinchinensis.JPG"}, {"a": "Dinesh Valke from Thane, India", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Buchanania_cochinchinensis_(3244071289).jpg"}], "almond": [{"a": "J.M.Garg", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:A_Hoverfly_on_a_Desi_Badam_(Terminalia_catappa)_in_Hyderabad,_AP_W_IMG_0494.jpg"}, {"a": "Alejandro Bayer Tamayo from Armenia, Colombia", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Almendro_(Terminalia_catappa)_(14787612664).jpg"}], "mahua": [{"a": "Satheesan.vn", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Bassia_latifolia_11.JPG"}, {"a": "Yann (talk)", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Leaves_of_Madhuca_longifolia,_Umaria_district,_MP,_India.jpg"}], "singhara": [{"a": "See source", "l": "CC BY-SA 2.5", "s": "https://commons.wikimedia.org/wiki/File:Fruit_of_Trapa_natans_(water_caltrop_or_water_chestnut).jpg"}], "lotus": [{"a": "British 19th Century", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:British_19th_Century,_East_Indian_Lotus_(Nelumbo_nucifera),_late_19th_century,_NGA_52325.jpg"}], "honey": [{"a": "Nireekshit", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Honey_Bee(Apis_dorsata)Hive.jpg"}], "honagonne": [{"a": "J.M.Garg", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Alternanthera_sessilis_W3_IMG_3422.jpg"}, {"a": "J.M.Garg", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Alternanthera_sessilis_W_IMG_3422.jpg"}], "basale": [{"a": "Adityamadhav83", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:(Basella_alba)_Malabar_spinach_fruit_at_Bandlaguda_02.JPG"}, {"a": "Arn", "l": "CC BY 4.0", "s": "https://commons.wikimedia.org/wiki/File:Baseele_blanche.jpg"}], "kalmi": [{"a": "Judgefloro", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:0002jfVegetable_plantations_Taal_Pulilan_Bulacanfvf_11.jpg"}, {"a": "Judgefloro", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:03899jfPasig_City_Boundary_Buting_Bridge_School_Creek_Monument_Makati_Cityfvf_19.jpg"}], "chakoda": [{"a": "Nikitakamka", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Cassia_Tora_(the_seeds).JPG"}, {"a": "Nikitakamka", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Cassia_Tora_(young_plant).JPG"}], "kantola": [{"a": "Dinesh Valke from Thane, India", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Momordica_dioica_(1129111386).jpg"}], "ivygourd": [{"a": "Prathyush Thomas", "l": "GFDL 1.2", "s": "https://commons.wikimedia.org/wiki/File:Baby_Watermelon_BNC.jpg"}, {"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Coccinia_grandis.jpg"}], "bananaflower": [{"a": "Warut Roonguthai", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Inside_a_wild-type_banana.jpg"}], "fishwort": [{"a": "en:User:HelloMojo.", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Houttuynia_cordata_Chameleon.jpg"}], "culantro": [{"a": "Maxintaft", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:EryngiumfoetidumMM.jpg"}], "treebean": [{"a": "Okkisafire", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Kedaung_seeds.jpg"}, {"a": "Renaudsechet", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Parkia_timoriana_haricots_et_feves_Riang_%E0%B9%80%E0%B8%AB%E0%B8%A3%E0%B8%B5%E0%B8%A2%E0%B8%87_IMG_0218.jpg"}], "kachnar": [{"a": "Amitabha Gupta", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bauhinia_Variegata_%22Var_candida%22_(white_flowering_bauhinia).jpg"}, {"a": "蒭藁增二", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bauhinia_tree_in_bloom,_March_2015.jpg"}], "agathi": [{"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Agathi_-_Unknown_-_19_1927_2_39.jpg"}, {"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Sesbania_grandiflora.jpg"}], "buransh": [{"a": "P. F. Fyson (1877-1947)", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Fyson179-Rhododendron_arboreum.jpg"}, {"a": "Marcus334", "l": "CC BY 3.0", "s": "https://commons.wikimedia.org/wiki/File:Rhododendron_arboreum_subsp._nilagiricum_(1).jpg"}], "neemflower": [{"a": "Knowledge and philosophy", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Azadirachta_indica_July_2025.jpg"}], "matira": [{"a": "Albert Eckhout", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Albert_Eckhout_1610-1666_Brazilian_fruits.jpg"}, {"a": "Sangfroid", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Cantaloupe_Melon_cross_section.png"}], "peelu": [{"a": "J.M.Garg", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Khabbar_(Salvadora_oleoides),_Hodal_(Faridabad,_Haryana)_I_IMG_1194.jpg"}], "kumat": [{"a": "Franz Eugen Köhler, Köhler's Medizinal-Pflanzen", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Acacia_senegal_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-004.jpg"}, {"a": "Paul Taubert", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Acacia_senegal_Taub68.png"}], "kendu": [{"a": "S. K. Gawali", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Bark_of_Diospyros_melanoxylon.jpg"}, {"a": "Pankaj Oudhia", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Diospyros_melanoxylon_Tendu.jpg"}], "kusum": [{"a": "Salil Kumar Mukherjee", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Kusum_(Schleichera_oleosa)_seeds.jpg"}, {"a": "Dinesh Valke from Thane, India", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Kusumbha_(Sanskrit-_%E0%A4%95%E0%A5%81%E0%A4%B8%E0%A5%81%E0%A4%82%E0%A4%AD)_(451989507).jpg"}], "wilddate": [{"a": "A_junaid_alam_khan (talk) (Uploads)", "l": "PD", "s": "https://en.wikipedia.org/wiki/File:COLLECTING_DATE_SAP.JPG"}, {"a": "HPNadig", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Ichalu_with_fruits.jpg"}], "grewia": [{"a": "Asit K. Ghosh Thaumaturgist", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Phalsa09_Asit.jpg"}, {"a": "Salil Kumar Mukherjee", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Phalsa_fruits_(Grewia_asiatica).jpg"}], "kaith": [{"a": "Thamizhpparithi Maari", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Limonia_acidissima_of_Salem.jpg"}, {"a": "Seisfeldt at English Wikipedia", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Wood-apple_dec2007.jpg"}], "custardapple": [{"a": "J.M.Garg", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Annona_squamosa_(Custurd_Apple)_flower_in_Hyderabad,_AP_W_IMG_9352.jpg"}, {"a": "J.M.Garg", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Annona_squamosa_(Custurd_Apple)_plant_in_Hyderabad,_AP_W_IMG_9354.jpg"}], "guava": [{"a": "US Pacific Basin Agricultural Research Center", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:ARS_HPSI41.jpg"}, {"a": "Dunog", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Goya_blancs.JPG"}], "monkeyjack": [{"a": "Krish Dulal", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Artocarpus_lacucha_KR.JPG"}, {"a": "Salil Kumar Mukherjee", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Monkey_jack_(Artocarpus_lacucha)_fruits.jpg"}], "kudampuli": [{"a": "Challiyan", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Bark_of_Garcinia_cambogia.jpg"}, {"a": "Vijayanrajapuram", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Garcinia_gummi-gutta_Kudampuli_C.S._of_fruit.jpg"}], "hogplum": [{"a": "Primejyothi", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:SpondiasPinnata_9907.JPG"}, {"a": "Vinayaraj", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Spondias_pinnata.jpg"}], "jalebi": [{"a": "Elisa.rolle", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Pithecellobium_dulce,_Fort_Canning.jpg"}], "elephantapple": [{"a": "Nandini Velho", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Albinistic_Dillenia_indica_in_Pakke_Tiger_Reserve.JPG"}, {"a": "ସରୋଜ କୁମାର ବେହେରା", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Dillenia_indica_Flower.JPG"}], "mulberry": [{"a": "Didier Descouens", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:(MHNT)_Morus_alba_-_immatures_inflorescences_and_flowers.jpg"}, {"a": "Famartin", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:2014-10-30_10_05_50_Mulberry_autumn_foliage_along_Dunmore_Avenue_in_Ewing,_New_Jersey.JPG"}], "mehal": [{"a": "Frank Schulenburg", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Flowers_of_Pyrus_pashia_(Quarryhill_Botanical_Garden).jpg"}], "kilmora": [{"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Berberis_ilicifolia_(drawing_in_colour).jpg"}], "timla": [{"a": "Koppchen", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Ficus_auriculata_04.jpg"}, {"a": "fotokannan", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Ficus_auriculata_fruit_2.jpg"}], "ghain": [{"a": "Jaknouse at English Wikipedia", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Autumnolive2.JPG"}, {"a": "VoDeTan2Dericks-Tan", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Elaeagnus_umbellata_Frucht.jpg"}], "daru": [{"a": "See source", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:1-albero,_Taccuino_Sanitatis,_Casanatense_4182..jpg"}], "apricot": [{"a": "Matejin", "l": "CC BY 4.0", "s": "https://commons.wikimedia.org/wiki/File:Apricot_Blossom_Pollination_-_Picture_1,_cropped.jpg"}, {"a": "Fir0002", "l": "GFDL 1.2", "s": "https://commons.wikimedia.org/wiki/File:Apricot_and_cross_section.jpg"}], "chilgoza": [{"a": "Gv3101992", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Pinus_gerardiana_India18.jpg"}], "makhana": [{"a": "Miguel Hermoso Cuesta", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Cascada_del_cocodrilo._La_Mortella._02.JPG"}, {"a": "The original uploader was ミュール at Japanese Wikipedia.", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:E-ferox-20021002a.jpg"}], "bamboorice": [{"a": "Biodiversity Heritage Library", "l": "CC BY 2.0", "s": "https://commons.wikimedia.org/wiki/File:18th_century_illustration_flora_of_the_coast_of_Coromandel_Coast_India_Plants_Fruits_Flowers_(10).jpg"}, {"a": "Tristan Schmurr from Luxembourg.", "l": "CC BY 2.0", "s": "https://commons.wikimedia.org/wiki/File:Indian_thorny_bamboo_(Bambusa_bambos)_in_the_Singapore_Botanic_Gardens.jpg"}], "suran": [{"a": "J A Forbes", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Amorphophallus_Paeoniifolius_f.jpg"}, {"a": "Obsidian Soul", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:Amorphophallus_paeoniifolius_fruits_(Philippines)_2.jpg"}], "tikhur": [{"a": "John Fleming", "l": "CC BY 4.0", "s": "https://commons.wikimedia.org/wiki/File:Indian_Medicinal_Plants_and_Drugs_Wellcome_L0032802.jpg"}], "redant": [{"a": "PHGCOM", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:AntsStitchingLeave.jpg"}], "taro": [{"a": "Wildfeuer", "l": "CC BY 2.5", "s": "https://commons.wikimedia.org/wiki/File:2006-10-22Colocasia01.jpg"}, {"a": "Irvin Parco Sto. Tomas", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:A_variety_of_taro_plant_at_Mount_Isarog_National_Park.jpg"}], "shatavari": [{"a": "Silk666", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Asparagus_racemosus_fleurs.JPG"}], "cane": [{"a": "User:AndonicO", "l": "CC BY 2.5", "s": "https://commons.wikimedia.org/wiki/File:Palm_tree.jpg"}], "palmtuber": [{"a": "Dinesh Valke from Thane, India", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Borassus_flabellifer_L._(53278558122).jpg"}]}/*GALLERY*/;
+const TWINS={"gloriosa": {"a": "Macvivo at English Wikipedia (Original text: Samwise Gamgee)", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Flame_Lily.jpg"}, "alocasia": {"a": "KENPEI", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Alocasia_macrorrhizos1.jpg"}, "spurge": {"a": "Juan Carlos Fonseca Mata", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Hierba_de_la_golondrina_(Euphorbia_hirta)_I.jpg"}, "diplocyclos": {"a": "Mark Marathon", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Diplocyclos_palmatus_fruit.jpg"}, "bracken": {"a": "Rasbak", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Adelaarsvaren_planten_Pteridium_aquilinum.jpg"}, "colocynth": {"a": "Franz Eugen Köhler, Köhler's Medizinal-Pflanzen", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Citrullus_colocynthis_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-040.jpg"}, "nuxvomica": {"a": "Franz Eugen Köhler", "l": "Public domain", "s": "https://commons.wikimedia.org/wiki/File:Strychnos_nux-vomica_-_K%C3%B6hler%E2%80%93s_Medizinal-Pflanzen-266.jpg"}, "lantana": {"a": "Alvesgaspar", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:LantanaFlowerLeaves.jpg"}}/*TWINS*/;
+const DISHPICS={"kokum-sharbat": {"a": "Prajna Prabhu", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Kokum_or_Punarpuli_sharbat.jpg"}, "aam-panna": {"a": "Zeel Patel", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Aam_Panna_-_Summer_Cooler.JPG"}, "wood-apple-sharbat": {"a": "Vivekpat30", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Wood-apple-juice.jpg"}, "jamun-juice": {"a": "बृहस्पति", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Jamun_Shots.png"}, "imli-sharbat": {"a": "Miansari66", "l": "CC0", "s": "https://commons.wikimedia.org/wiki/File:Imli_Aloo_Bukharay_Sharbat.jpg"}, "alu-vadi-patra-pathrode": {"a": "Sharvarism", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Crispy_Alu_Vadi_from_my_Kitchen,_Pune,_Maharashtra.jpg"}, "roasted-makhana": {"a": "Salil Kumar Mukherjee", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Roasted_Makhana_(Foxnut).jpg"}, "arbi-fry": {"a": "Radhika41", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Arbi_fry.jpg"}, "singju": {"a": "Punshiba18", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Yongchaak_Singju_with_Hawai_Maton.jpg"}, "amla-pickle": {"a": "no author", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Indian_gooseberry_pickle.png"}, "bathua-raita": {"a": "Ravi Talwar", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Bathua_Raita.JPG"}, "ugadi-pachadi": {"a": "Srinivas14", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:UgadiPachadi.JPG"}, "drumstick-sambar": {"a": "Booradleyp1", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Sambar_(drumstick).jpg"}, "ker-sangri": {"a": "AKSHRAJJODHA", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Ker_Sangri.jpg"}, "kathal-biryani": {"a": "Kahani Swaad Ki", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Kathal_Dum_Biryani.jpg"}, "bamboo-shoot-pork": {"a": "pelican from Tokyo, Japan", "l": "CC BY-SA 2.0", "s": "https://commons.wikimedia.org/wiki/File:Pork_and_bamboo_shoot_curry_(2560159109).jpg"}, "kudampuli-fish-curry": {"a": "Samphotography", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Fish_Curry_Kerala.jpg"}, "aam-papad": {"a": "Gannu03", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Aam_papad_2.jpg"}, "amla-murabba": {"a": "Bhuvankrishna", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Home_Made_amla_sweet.jpg"}, "mulberry-jam": {"a": "CNEcija12345", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Mulberries_jam_CNE.jpg"}, "guava-cheese": {"a": "Voton", "l": "CC BY-SA 3.0", "s": "https://commons.wikimedia.org/wiki/File:Goiabada_slice.jpg"}, "nolen-gur-sandesh": {"a": "ANKAN", "l": "CC BY-SA 4.0", "s": "https://commons.wikimedia.org/wiki/File:Nolen_Gur%27s_Sandesh.jpg"}}/*DISHPICS*/;
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const REGION_NAMES={S:"South India",W:"West coast and Deccan",D:"Thar and dry northwest",C:"Central forests",E:"East",NE:"Northeast",N:"Northern plains",H:"Himalaya"};
+const STATES={"Andaman and Nicobar Islands":["S"],"Andhra Pradesh":["S"],"Arunachal Pradesh":["NE","H"],"Assam":["NE"],"Bihar":["E","N"],"Chandigarh":["N"],"Chhattisgarh":["C"],"Dadra and Nagar Haveli and Daman and Diu":["W"],"Delhi":["N"],"Goa":["W","S"],"Gujarat":["W","D"],"Haryana":["N"],"Himachal Pradesh":["H"],"Jammu and Kashmir":["H"],"Jharkhand":["E","C"],"Karnataka":["S"],"Kerala":["S"],"Ladakh":["H"],"Lakshadweep":["S"],"Madhya Pradesh":["C"],"Maharashtra":["W","C"],"Manipur":["NE"],"Meghalaya":["NE"],"Mizoram":["NE"],"Nagaland":["NE"],"Odisha":["E","C"],"Puducherry":["S"],"Punjab":["N"],"Rajasthan":["D"],"Sikkim":["NE","H"],"Tamil Nadu":["S"],"Telangana":["S","C"],"Tripura":["NE"],"Uttar Pradesh":["N"],"Uttarakhand":["H","N"],"West Bengal":["E"]};
+const TYPES={green:"Greens",fruit:"Fruit",root:"Roots & shoots",grain:"Grains & pulses",starch:"Starchy foods",protein:"Protein",nut:"Nuts & seeds",flower:"Flowers"};
+const NUTR={
+  energy:{name:"Calories",blurb:"Fuel. The hardest thing to forage enough of.",long:"Greens are filling but low in calories. Real energy comes from starchy fruit, tubers, seeds, nuts, flowers like mahua, and honey."},
+  protein:{name:"Protein",blurb:"Muscle and repair. The second big gap.",long:"Wild plants give some protein, but rarely enough on their own. Nuts, seeds, moringa and, near clean water, shellfish help most."},
+  fat:{name:"Fat",blurb:"Dense energy and fat-soluble vitamins.",long:"Fat is scarce in the wild. Nuts and oily seeds are the main sources, and they also help you absorb vitamin A from greens."},
+  vitC:{name:"Vitamin C",blurb:"Immunity and iron absorption.",long:"Easy to cover in India. Amla alone can do it, and sour wild fruit is everywhere in its season. Eat it alongside greens to absorb more iron."},
+  vitA:{name:"Vitamin A",blurb:"Eyes and immunity.",long:"Dark greens and orange fruit are the sources. Cook them with a little fat for better absorption."},
+  iron:{name:"Iron & calcium",blurb:"Blood and bones.",long:"Dark leafy greens are the forager's best source. Pair them with something sour, such as amla or tamarind, to help absorption."}
+};
+const ALL=["S","W","D","C","E","NE","N","H"];
+const range=(a,b)=>{const r=[];let m=a;for(let i=0;i<12;i++){r.push(m);if(m===b)break;m=m%12+1}return r};
+const P=[
+ {id:"moringa",name:"Moringa",sci:"Moringa oleifera",local:"Sahjan · Nugge · Murungai · Shevga",type:"green",regions:["S","W","C","E","N","D","NE"],months:range(1,12),nutr:["protein","iron","vitA","vitC"],note:"Feathery tree with tiny paired leaflets; long drumstick pods in spring.",eat:"Leaves in dal, palya or thoran. Pods in sambar. Flowers fried with besan.",store:"Shade-dry leaves until crisp, then grind to powder. Keeps 4–6 months airtight.",methods:["shade","powder"]},
+ {id:"amaranth",name:"Amaranth",sci:"Amaranthus viridis",local:"Chaulai · Dantu soppu · Keerai · Math",type:"green",regions:ALL,months:range(6,11),nutr:["iron","vitA","vitC"],note:"Upright weed of field edges and empty plots, oval leaves, spiky flower tips.",eat:"Stir-fry, saag, dal or poriyal. Young tips are the tenderest.",store:"Blanch and shade-dry, or cook and freeze. Seeds can be collected and popped.",methods:["shade"]},
+ {id:"bathua",name:"Bathua",sci:"Chenopodium album",local:"Bathua · Chakota soppu · Chakvat",type:"green",regions:["N","C","E","D","W","H","S"],months:range(11,3),nutr:["vitA","vitC","iron"],note:"Goose-foot leaves with a whitish powdery bloom on young tips. A winter field weed.",eat:"Parathas, raita (cooked), saag mixed with mustard greens.",store:"Shade-dry and crumble, or blanch and freeze.",warn:"High in oxalates. Cook it, and don't eat large amounts raw.",methods:["shade"]},
+ {id:"purslane",name:"Purslane",sci:"Portulaca oleracea",local:"Kulfa · Goni soppu · Paruppu keerai · Ghol",type:"green",regions:ALL,months:range(3,9),nutr:["vitC","vitA"],note:"Low, fleshy, reddish stems and paddle leaves in cracks and plots. Unusually rich in plant omega-3.",eat:"Raw in salads in small amounts, or in dal and bhaji.",store:"Best fresh. Can be pickled.",warn:"Don't confuse with spurge, which has milky sap. Purslane has none.",methods:["pickle"]},
+ {id:"woodsorrel",name:"Wood sorrel",sci:"Oxalis corniculata",local:"Amrul · Huli soppu · Puliyarai",type:"green",regions:ALL,months:range(6,2),nutr:["vitC"],note:"Tiny clover-like heart-shaped leaflets with small yellow flowers. Lemony taste.",eat:"Chutney or a handful in dal for sourness.",store:"Use fresh.",warn:"Contains oxalic acid. Eat in small amounts.",methods:[]},
+ {id:"pennywort",name:"Indian pennywort",sci:"Centella asiatica",local:"Brahmi · Ondelaga · Vallarai · Thankuni",type:"green",regions:["S","E","NE"],months:range(6,10),nutr:[],note:"Kidney-shaped leaves on creeping runners in damp, shady ground. Used more as a tonic than as food.",eat:"Chutney, tambuli, thankuni bata with rice.",store:"Shade-dry and powder.",methods:["shade","powder"]},
+ {id:"curry",name:"Curry leaves",sci:"Murraya koenigii",local:"Kadi patta · Karibevu · Kariveppilai",type:"green",regions:["S","W","C","E"],months:range(1,12),nutr:["iron","vitA"],note:"Small shrub-tree with glossy, aromatic paired leaflets.",eat:"Tempering, chutney powder, rice.",store:"Shade-dry, then roast into a podi with dal and chilli. Keeps 2–3 months.",methods:["shade","powder"]},
+ {id:"colocasia",name:"Colocasia leaves",sci:"Colocasia esculenta",local:"Arbi patta · Kesu · Alu · Chembu",type:"green",regions:["S","W","E","NE"],months:range(6,9),nutr:["vitA","vitC"],note:"Large heart-shaped leaves in wet ditches and paddy edges.",eat:"Patra, pathrode, or curries cooked with tamarind or kokum.",store:"Steamed patra rolls can be sliced and sun-dried.",warn:"Raw leaves contain crystals that burn the mouth and throat. Always cook thoroughly with something sour.",methods:["detox"]},
+ {id:"nettle",name:"Stinging nettle",sci:"Urtica dioica",local:"Bichhu buti · Kandali · Sisnu",type:"green",regions:["H"],months:[2,3,4,5,10,11],nutr:["protein","iron"],note:"Hairy toothed leaves on stalks near Himalayan villages and streams.",eat:"Kandali saag and soups once blanched.",store:"Blanch, then shade-dry and powder.",warn:"Wear gloves to pick it. Blanching removes the sting.",methods:["detox","shade"]},
+ {id:"fiddlehead",name:"Fiddlehead fern",sci:"Diplazium esculentum",local:"Lingdu · Dhekia · Ningro",type:"green",regions:["H","NE","E"],months:range(3,8),nutr:["vitA","vitC"],note:"Coiled young fronds by streams and in damp forest edges.",eat:"Stir-fry or pickle after boiling.",store:"Pickle in mustard oil, or blanch and dry.",warn:"Never eat raw. Boil and discard the water first.",methods:["detox","pickle"]},
+ {id:"bamboo",name:"Bamboo shoots",sci:"Bambusa",local:"Bans karil · Kalale · Khorisa · Mesu",type:"green",regions:["NE","S","E","C"],months:range(6,9),nutr:[],note:"Young shoots pushing up at the base of clumps in the monsoon. Fibrous and filling.",eat:"Curries, pork dishes in the Northeast, kalale palya in Malnad.",store:"Ferment in jars (khorisa, mesu), or boil and sun-dry.",warn:"Raw shoots contain cyanide-forming compounds. Peel, slice, boil, and discard the water. Forest bamboo is often protected.",methods:["detox","ferment"]},
+ {id:"amla",name:"Amla",sci:"Phyllanthus emblica",local:"Amla · Nellikayi · Nellikai · Avla",type:"fruit",regions:["S","W","C","E","N","H"],months:[11,12,1,2],nutr:["vitC"],note:"Round, pale green fruit with faint ribs, close along branches among feathery leaves.",eat:"Raw with salt, chutney, pickle, murabba.",store:"Salt and sun-dry slices, or make pickle. Keeps up to a year.",methods:["salt","pickle"]},
+ {id:"jamun",name:"Jamun",sci:"Syzygium cumini",local:"Jamun · Nerale · Naaval · Kalojam",type:"fruit",regions:["S","W","C","E","N","NE"],months:[5,6,7],nutr:["vitC"],note:"Tall avenue tree dropping deep purple oval fruit in early monsoon.",eat:"Fresh with salt, sorbet, jamun vinegar.",store:"Short-lived fresh. Dry the seeds for powder, or make syrup or vinegar.",methods:["salt"]},
+ {id:"ber",name:"Ber",sci:"Ziziphus mauritiana",local:"Ber · Elachi hannu · Ilanthai · Bor",type:"fruit",regions:["D","N","C","W","S","E"],months:[12,1,2,3],nutr:["vitC","energy"],note:"Thorny scrub tree with small round fruit going from green to yellow-brown.",eat:"Fresh, or ilanthai vadai (dried ber cakes) in Tamil Nadu.",store:"Sun-dry whole. Dried ber keeps for months.",methods:["salt"]},
+ {id:"mango",name:"Wild mango",sci:"Mangifera indica",local:"Aam · Appe midi · Kaadu maavu",type:"fruit",regions:["S","W","E","C","NE"],months:[4,5,6],nutr:["vitA","vitC","energy"],note:"Old trees on village edges and in forests. Small, fibrous, very aromatic fruit.",eat:"Ripe fresh, raw in pickles, panna, appe midi uppinakai.",store:"Aam papad (fruit leather), amchur, brined whole raw mangoes.",methods:["leather","salt","pickle"]},
+ {id:"jackfruit",name:"Jackfruit",sci:"Artocarpus heterophyllus",local:"Kathal · Halasu · Pala · Phanas",type:"starch",regions:["S","W","E","NE"],months:range(3,7),nutr:["energy","vitC","protein"],note:"Huge spiky fruit hanging off trunks. The biggest calorie source you can forage. Seeds add protein.",eat:"Raw as a vegetable or biryani, ripe as fruit, seeds boiled or roasted.",store:"Seeds keep for months coated in mud or dry sand. Make chips, papad, or dry the raw slices.",warn:"Trees almost always have an owner, so ask first.",methods:["seeds","leather"]},
+ {id:"tamarind",name:"Tamarind",sci:"Tamarindus indica",local:"Imli · Hunase · Puli · Chinch",type:"fruit",regions:["S","C","W","E","N","D"],months:[1,2,3,4],nutr:["energy"],note:"Huge avenue trees with brown curved pods. Young leaves and flowers are sour and edible too.",eat:"Souring for rasam, puliyogare, chutney. Roasted seeds were a famine food.",store:"De-seed, salt lightly, press into blocks, sun-dry. Keeps over a year.",methods:["salt"]},
+ {id:"bael",name:"Bael",sci:"Aegle marmelos",local:"Bael · Bilva · Vilvam · Bel",type:"fruit",regions:["N","C","E","W","S","D"],months:[3,4,5,6],nutr:["energy","vitC"],note:"Thorny temple tree with hard, round, woody fruit. Fragrant orange pulp inside.",eat:"Bael sharbat, or the pulp eaten fresh.",store:"Slice and sun-dry the pulp, or make a thick syrup.",methods:["salt"]},
+ {id:"fig",name:"Cluster fig",sci:"Ficus racemosa",local:"Gular · Atti · Atthi · Umbar",type:"fruit",regions:["S","W","C","E","N","NE","H"],months:range(3,8),nutr:["energy","iron"],note:"Fruit grows in clusters straight on the trunk. Common near water and temples.",eat:"Ripe fruit fresh, unripe fruit cooked as a vegetable.",store:"Split and sun-dry.",warn:"Fig wasps live inside. Split each one and check.",methods:["salt"]},
+ {id:"karonda",name:"Karonda",sci:"Carissa carandas",local:"Karonda · Kavali · Kalakkai · Karvand",type:"fruit",regions:["W","C","S","D","N"],months:[7,8,9],nutr:["vitC","iron"],note:"Thorny hedge shrub with small berries that go from pink to almost black.",eat:"Pickle, chutney, jam. Ripe dark berries can be eaten fresh.",store:"Pickle in salt and mustard oil.",methods:["pickle"]},
+ {id:"kokum",name:"Kokum",sci:"Garcinia indica",local:"Kokum · Murugalu · Bhirand",type:"fruit",regions:["S","W"],months:[3,4,5],nutr:[],note:"Western Ghats and Konkan tree with purple-red sour fruit. Cooling in summer.",eat:"Sol kadhi, saaru, kokum sharbat.",store:"Salt and sun-dry the rinds. Keeps a year. Also makes syrup.",methods:["salt"]},
+ {id:"cashew",name:"Cashew apple & nut",sci:"Anacardium occidentale",local:"Kaju · Geru · Mundiri · Kaju bondu",type:"nut",regions:["S","W","E"],months:[3,4,5],nutr:["vitC","fat","protein","energy"],note:"Coastal tree with a juicy apple and the nut hanging beneath it. The apple is very high in vitamin C.",eat:"Apple fresh or in curry. Nuts after proper roasting.",store:"Roasted shelled nuts keep for months.",warn:"Raw shells hold a caustic oil that burns skin. Roast outdoors and stay out of the smoke.",methods:["detox","seeds"]},
+ {id:"palmyra",name:"Palmyra palm",sci:"Borassus flabellifer",local:"Tadgola · Taati nungu · Nungu · Taal",type:"fruit",regions:["S","E","W"],months:[4,5,6,12,1],nutr:["energy"],note:"Tall fan-leaf palm on dry plains and coasts. Jelly fruit in summer, sprouted tubers in winter.",eat:"Nungu fresh. Boiled tubers (panang kizhangu) in Dec–Jan.",store:"Dry the boiled tubers and grind to flour.",methods:["powder"]},
+ {id:"sangri",name:"Khejri (sangri)",sci:"Prosopis cineraria",local:"Sangri · Khejri · Shami",type:"green",regions:["D","W"],months:[3,4,5],nutr:["protein","energy"],note:"The desert's lifeline tree. Thin green pods are picked young.",eat:"Ker-sangri with ker berries.",store:"Blanch and sun-dry. Dried sangri keeps a year or more.",methods:["blanchdry"]},
+ {id:"ker",name:"Ker",sci:"Capparis decidua",local:"Ker · Kair · Karil",type:"fruit",regions:["D"],months:[4,5,6],nutr:[],note:"Leafless, thorny desert shrub with small round green berries.",eat:"Ker-sangri, pickle.",store:"Soak, blanch and sun-dry, or pickle.",warn:"Very bitter raw. Soak in salt water for several days, changing the water, before cooking.",methods:["detox","blanchdry","pickle"]},
+ {id:"lasoda",name:"Lasoda",sci:"Cordia myxa",local:"Lasoda · Gunda · Lasura",type:"fruit",regions:["D","N","W","C"],months:[4,5,6],nutr:[],note:"Small tree with clusters of sticky green berries.",eat:"Pickle or sabzi when green.",store:"Pickle in mustard oil.",methods:["pickle"]},
+ {id:"seabuckthorn",name:"Seabuckthorn",sci:"Hippophae rhamnoides",local:"Tsestalulu · Chharma",type:"fruit",regions:["H"],months:[8,9,10],nutr:["vitC","vitA","fat"],note:"Spiny shrub of Ladakh, Lahaul and Spiti, covered in bright orange berries.",eat:"Juice, jam, tea.",store:"Freeze the berries, or make juice concentrate.",methods:[]},
+ {id:"kafal",name:"Kafal",sci:"Myrica esculenta",local:"Kafal · Kaphal",type:"fruit",regions:["H","NE"],months:[4,5,6],nutr:["vitC"],note:"Mid-hill tree of Uttarakhand and Himachal. Small dark red berries.",eat:"Fresh with salt and chilli.",store:"Eat fresh. It spoils within days.",methods:[]},
+ {id:"hisalu",name:"Hisalu",sci:"Rubus ellipticus",local:"Hisalu · Aakhe",type:"fruit",regions:["H","NE"],months:[4,5,6],nutr:["vitC"],note:"Thorny Himalayan bramble with golden-yellow raspberries.",eat:"Fresh, or as jam.",store:"Jam.",methods:[]},
+ {id:"walnut",name:"Walnut",sci:"Juglans regia",local:"Akhrot · Khor",type:"nut",regions:["H"],months:[9,10],nutr:["fat","protein","energy"],note:"Big Himalayan trees, often semi-wild around villages. Ask before picking.",eat:"Raw, in chutney, in rotis.",store:"Dry in the husk-free shell. Keeps a year.",methods:["seeds"]},
+ {id:"chironji",name:"Chironji",sci:"Buchanania lanzan",local:"Chironji · Charoli · Saara paruppu",type:"nut",regions:["C","E","W"],months:[4,5],nutr:["fat","protein","energy"],note:"Dry deciduous forest tree. Small purple fruit with a prized kernel inside.",eat:"Kernels in sweets and kheer, or raw.",store:"Crack, dry and store the kernels airtight for months.",methods:["seeds"]},
+ {id:"almond",name:"Indian almond",sci:"Terminalia catappa",local:"Desi badam · Kaadu badaami · Nattuvadumai",type:"nut",regions:["S","E","W"],months:range(7,12),nutr:["fat","protein"],note:"Avenue and coastal tree with big leaves that turn red, and almond-shaped fruit.",eat:"Crack the hard shell and eat the small kernel.",store:"Dry the fruit whole and crack as needed.",methods:["seeds"]},
+ {id:"mahua",name:"Mahua",sci:"Madhuca longifolia",local:"Mahua · Ippe · Iluppai · Moha",type:"flower",regions:["C","E","W","N"],months:[3,4,5,6],nutr:["energy","fat"],note:"Central India's tribal food tree. Fleshy, sweet cream flowers fall at night in spring. Seeds give oil.",eat:"Flowers cooked with rice or roasted; laddoos. Seed oil for cooking.",store:"Sun-dry the flowers. They keep about a year.",methods:["flowers"]},
+ {id:"yam",name:"Wild yam",sci:"Dioscorea",local:"Jangli kand · Genasu · Kaattu kizhangu",type:"starch",regions:["S","E","C","NE"],months:[10,11,12,1,2],nutr:["energy"],note:"Twining vine with heart-shaped leaves. The tuber is dug in the dry season.",eat:"Boiled, then curried or roasted.",store:"Slice, soak, boil, then sun-dry the chips.",warn:"Many wild yams are toxic raw. Only dig ones a local forager recognises, and slice, soak and boil them well.",methods:["detox"]},
+ {id:"singhara",name:"Water chestnut",sci:"Trapa natans",local:"Singhara · Paniphal",type:"starch",regions:["N","E","C"],months:[10,11,12],nutr:["energy"],note:"Floating pond plant with horned dark fruit.",eat:"Boiled or roasted. Flour for fasting rotis.",store:"Dry the kernels and grind into flour.",warn:"Only from clean ponds. Always cook.",methods:["powder"]},
+ {id:"lotus",name:"Lotus stem & seeds",sci:"Nelumbo nucifera",local:"Kamal kakdi · Nadru · Bhein · Makhana",type:"starch",regions:["E","N","H"],months:[10,11,12,1,2],nutr:["energy","protein"],note:"Kashmir's lakes and the eastern plains' ponds. Stems are starchy, and the seeds carry protein.",eat:"Nadru yakhni, chips, fresh lotus seeds.",store:"Dry seeds keep for months. Pop them like makhana.",warn:"Only from clean water. Cook thoroughly.",methods:["seeds"]},
+ {id:"honey",name:"Wild honey",sci:"Apis dorsata",local:"Jangli shahad · Kaadu jenu · Kaattu then",type:"flower",regions:["C","E","S","NE","W"],months:[3,4,5],nutr:["energy"],note:"Rock bee combs high on cliffs and trees.",eat:"As it is, or as a sweetener.",store:"Keeps indefinitely sealed.",warn:"Leave harvesting to traditional honey hunters. Rock bees are dangerous.",methods:[]},
+ {id:"shellfish",name:"Clams & shellfish",sci:"Meretrix casta",local:"Marvai · Tisrya · Kakka",type:"protein",regions:["S","W","E"],months:[10,11,12,1,2,3],nutr:["protein","iron"],note:"Clams on estuary mudflats and coastal sand.",eat:"Sukka, curry, tisryo masala.",store:"Cook the same day.",warn:"Skip during the monsoon ban and near towns or drains. Discard any that don't open after cooking.",methods:[]},
+ {id:"snails",name:"Paddy snails & small fish",sci:"Pila globosa",local:"Gugli · Shamuk · Nathai",type:"protein",regions:["E","NE","S","C"],months:range(7,11),nutr:["protein","iron"],note:"A traditional protein in flooded rice fields across the east and northeast.",eat:"Boiled, then curried.",store:"Cook the same day. Small fish can be salted and sun-dried.",warn:"Only from clean, pesticide-free fields. Boil thoroughly, since snails can carry parasites.",methods:["salt"]},
+ {id:"honagonne",name:"Sessile joyweed",sci:"Alternanthera sessilis",local:"Honagonne · Ponnanganni · Matsyakshi",type:"green",regions:["S","E","C","N","W"],months:range(1,12),nutr:["iron","vitA"],note:"Low creeping green with small white flower heads in lake beds and damp ground. A favourite of Bengaluru's foragers.",eat:"Saaru, palya, poriyal, scrambled with eggs.",store:"Shade-dry and powder.",warn:"Lake beds are often polluted. Pick only from clean ground.",methods:["shade"]},
+ {id:"spinyamaranth",name:"Spiny amaranth",sci:"Amaranthus spinosus",local:"Kateli chaulai · Mullu harive · Mullu keerai",type:"green",regions:["S","W","C","E","N","NE","D"],months:range(6,10),nutr:["iron","vitA","vitC"],note:"Amaranth with sharp paired spines at each leaf base. Common on roadsides and waste ground.",eat:"Young leaves cooked like spinach.",store:"Shade-dry.",warn:"Pick with care around the spines. Cook it.",methods:["shade"]},
+ {id:"basale",name:"Malabar spinach",sci:"Basella alba",local:"Poi saag · Basale · Pasalai · Mayalu",type:"green",regions:["S","E","W","NE"],months:range(6,11),nutr:["vitA","vitC","iron"],note:"Climber with thick, glossy, heart-shaped leaves and often red stems. Half-wild on fences.",eat:"Basale-bassaru, saag, dosa batter, pakoras.",store:"Best fresh. Blanch and freeze.",methods:[]},
+ {id:"kalmi",name:"Water spinach",sci:"Ipomoea aquatica",local:"Kalmi saag · Nali bhaji · Vallarai keerai",type:"green",regions:["E","NE","S","N","C"],months:range(6,11),nutr:["iron","vitA"],note:"Hollow-stemmed creeper with arrow-shaped leaves, floating in ponds and ditches.",eat:"Stir-fried with garlic, or kalmi saag.",store:"Use fresh.",warn:"It thrives in dirty water and absorbs pollutants. Only pick from clean ponds, and cook it.",methods:[]},
+ {id:"chakoda",name:"Sickle senna",sci:"Senna tora",local:"Chakoda · Takla · Thagache · Panwar",type:"green",regions:["C","W","E","S","N"],months:[6,7,8],nutr:["iron"],note:"Monsoon weed with rounded leaflets in pairs of three and small yellow flowers. A tribal staple green.",eat:"Young leaves only, as bhaji with onion and garlic.",store:"Blanch and shade-dry.",warn:"Use only the tender first leaves, always cooked, in moderate amounts. It is laxative.",methods:["detox","shade"]},
+ {id:"kantola",name:"Spiny gourd",sci:"Momordica dioica",local:"Kantola · Kakroda · Paagal · Kartoli",type:"green",regions:["S","W","E","C","N","NE"],months:[7,8,9],nutr:["vitC","iron"],note:"Wild climber with small soft-spiked green fruit, found on hedges in the monsoon.",eat:"Stuffed, fried or as sabzi.",store:"Slice and sun-dry, or pickle.",methods:["salt","pickle"]},
+ {id:"ivygourd",name:"Ivy gourd",sci:"Coccinia grandis",local:"Kundru · Tondli · Thonde · Kovakkai",type:"green",regions:["S","W","E","C","N"],months:range(3,11),nutr:["vitA"],note:"Climber smothering fences, with five-lobed leaves and small striped green fruit. Leaves are edible too.",eat:"Young green fruit as sabzi or poriyal. Leaves in dal.",store:"Slice and sun-dry.",methods:["salt"]},
+ {id:"bananaflower",name:"Wild banana flower & stem",sci:"Musa balbisiana",local:"Kela phool · Bale hoovu · Vazhaipoo · Kol posola",type:"green",regions:["NE","S","E","W"],months:range(1,12),nutr:[],note:"Wild seeded bananas grow along Northeast and Ghats forest streams. The purple bud and inner stem are eaten.",eat:"Vazhaipoo vadai, thoran, khar, curries.",store:"Use fresh. Keep the stem in buttermilk water to stop browning.",methods:[]},
+ {id:"fishwort",name:"Fishwort",sci:"Houttuynia cordata",local:"Ja mardoh · Toningkhok · Masundari",type:"green",regions:["NE"],months:range(3,7),nutr:[],note:"Heart-shaped leaves with a strong fishy-citrus smell, in wet shady ground across the Northeast.",eat:"Raw in salads and chutneys with fermented fish or pork.",store:"Use fresh.",methods:[]},
+ {id:"culantro",name:"Culantro",sci:"Eryngium foetidum",local:"Bhot dhaniya · Awa phadhania · Sha maroi",type:"green",regions:["NE","E"],months:range(1,12),nutr:["vitA"],note:"Saw-edged long leaves with a powerful coriander smell. Half-wild across the Northeast.",eat:"Chopped into chutneys, curries and salads.",store:"Shade-dry, or freeze chopped.",methods:["shade"]},
+ {id:"treebean",name:"Tree bean",sci:"Parkia timoriana",local:"Yongchak · Zawngtah · Kharial",type:"protein",regions:["NE"],months:[11,12,1,2,3],nutr:["protein"],note:"Tall tree with long twisted green pods hanging in bunches. Prized in Manipur and Mizoram.",eat:"Young pods in eromba and singju. Seeds cooked.",store:"Slice and sun-dry the seeds.",methods:["salt"]},
+ {id:"kachnar",name:"Kachnar buds",sci:"Bauhinia variegata",local:"Kachnar · Kuler · Koliar · Semla",type:"flower",regions:["N","H","C","E","NE"],months:[2,3,4],nutr:[],note:"Orchid-like pink and white flowers on a camel-hoof-leaf tree. Buds are picked before opening.",eat:"Kachnar ki sabzi, raita, pickle. Young leaves (kuler sago) in Odisha.",store:"Blanch and sun-dry the buds.",methods:["blanchdry"]},
+ {id:"agathi",name:"Agathi flowers & leaves",sci:"Sesbania grandiflora",local:"Agastya · Agase · Agathi keerai · Bok phool",type:"flower",regions:["S","E","W"],months:range(10,2),nutr:["vitA","iron"],note:"Slender tree with long hanging white or pink flowers. Leaves are a calcium-rich green.",eat:"Agase hoovina bajji, keerai poriyal, bok phool bhaja.",store:"Use fresh. Shade-dry the leaves.",methods:["shade"]},
+ {id:"buransh",name:"Buransh",sci:"Rhododendron arboreum",local:"Buransh · Lali gurans",type:"flower",regions:["H","NE"],months:[2,3,4],nutr:["vitC"],note:"State tree of Uttarakhand, covered in red blossoms in spring.",eat:"Petals in juice, chutney and squash.",store:"Make squash or dry the petals.",warn:"Only the red tree species. Other rhododendrons, especially high-altitude shrubs, are toxic.",methods:[]},
+ {id:"neemflower",name:"Neem flowers",sci:"Azadirachta indica",local:"Neem · Bevu hoovu · Veppam poo",type:"flower",regions:["S","N","C","W","E","D"],months:[3,4],nutr:[],note:"Tiny, fragrant white flowers on the neem tree around Ugadi. Bitter.",eat:"Ugadi pachadi, veppam poo rasam, fried with rice.",store:"Shade-dry. Keeps a year.",warn:"Small amounts only. Neem oil and seeds are not food.",methods:["shade"]},
+ {id:"phog",name:"Phog",sci:"Calligonum polygonoides",local:"Phog · Phogla",type:"flower",regions:["D"],months:[3,4],nutr:[],note:"Leafless desert shrub of sand dunes. Its flower buds are a Thar delicacy.",eat:"Phogla raita with curd, or as sabzi.",store:"Sun-dry the buds.",methods:["blanchdry"]},
+ {id:"kachri",name:"Kachri",sci:"Cucumis callosus",local:"Kachri · Kachar · Kachariya",type:"fruit",regions:["D","N","W"],months:[9,10,11],nutr:["vitC"],note:"Wild melon of the Thar, plum-sized and striped. Grows on its own in sandy fields after the rains.",eat:"Kachri chutney and sabzi. The powder tenderises meat.",store:"Slice and sun-dry, then powder.",methods:["salt","powder"]},
+ {id:"matira",name:"Matira",sci:"Citrullus lanatus",local:"Matira · Kalinga",type:"fruit",regions:["D"],months:[8,9,10],nutr:["energy"],note:"Small wild watermelon of the desert. Water source and food in one.",eat:"Flesh fresh. Seeds dried and ground into flour for sogra rotis.",store:"Dry and grind the seeds.",methods:["seeds","powder"]},
+ {id:"peelu",name:"Peelu",sci:"Salvadora oleoides",local:"Peelu · Jaal · Mitha jaal",type:"fruit",regions:["D","W","N"],months:[5,6],nutr:["energy"],note:"Gnarled desert tree on saline soil, with sweet, tiny yellow-red berries in early summer.",eat:"Fresh, by the handful.",store:"Sun-dry.",methods:["salt"]},
+ {id:"kumat",name:"Kumat",sci:"Senegalia senegal",local:"Kumat · Kumtha",type:"nut",regions:["D"],months:[11,12,1],nutr:["protein","energy"],note:"Thorny desert acacia. Its seeds go into Rajasthan's famous panchkuta.",eat:"Panchkuta with ker, sangri, kachri and lasoda.",store:"Boil and sun-dry the seeds.",methods:["blanchdry"]},
+ {id:"kendu",name:"Kendu",sci:"Diospyros melanoxylon",local:"Tendu · Kendu · Beedi patta",type:"fruit",regions:["C","E","W"],months:[4,5,6],nutr:["energy","vitA"],note:"The beedi-leaf tree of central India's forests. Yellowish fruit with sweet, sticky pulp.",eat:"Ripe fruit fresh.",store:"Short-lived. Eat fresh.",methods:[]},
+ {id:"kusum",name:"Kusum",sci:"Schleichera oleosa",local:"Kusum · Kosam · Puvam",type:"fruit",regions:["C","E","S"],months:[5,6,7],nutr:["energy","fat"],note:"Forest tree whose new leaves flush bright red. Sour fruit, and the seeds give an oil.",eat:"Pulp fresh or in chutney. Seed oil cooked by tribal communities.",store:"Dry the seeds.",methods:["seeds"]},
+ {id:"wilddate",name:"Wild date palm",sci:"Phoenix sylvestris",local:"Khajur · Eechalu · Eechampazham · Shindi",type:"fruit",regions:["D","N","C","W","S","E"],months:[5,6,7],nutr:["energy"],note:"Rough-trunked palm of dry plains and field bunds, with orange-to-purple date clusters.",eat:"Ripe dates fresh. Winter sap boiled into nolen gur in Bengal.",store:"Sun-dry the dates.",methods:["salt"]},
+ {id:"grewia",name:"Wild phalsa",sci:"Grewia",local:"Phalsa · Dhaman · Kaadu butti",type:"fruit",regions:["N","C","D","W","S"],months:[5,6],nutr:["vitC"],note:"Shrubby trees with small purple-black or orange berries in early summer.",eat:"Fresh with salt, or phalsa sharbat.",store:"Make sharbat syrup.",methods:[]},
+ {id:"kaith",name:"Wood apple",sci:"Limonia acidissima",local:"Kaith · Bela · Vilampazham · Kavath",type:"fruit",regions:["S","C","W","E","N"],months:[10,11,12,1,2,3],nutr:["energy"],note:"Thorny tree of dry scrub. The fruit is a hard grey ball holding brown, sweet-sour pulp.",eat:"Pulp with jaggery, chutney, or vilampazham pachadi.",store:"Whole fruit keeps weeks. Dry the pulp with jaggery.",methods:["leather"]},
+ {id:"custardapple",name:"Wild custard apple",sci:"Annona squamosa",local:"Sitaphal · Seethaphala · Seetha pazham",type:"fruit",regions:["S","C","W","E"],months:[8,9,10,11],nutr:["energy","vitC"],note:"Gone wild on rocky hills across the Deccan. Knobbly green fruit with white custardy pulp.",eat:"Ripe pulp fresh.",store:"Freeze the pulp.",warn:"Never eat the seeds. They are toxic.",methods:[]},
+ {id:"guava",name:"Feral guava",sci:"Psidium guajava",local:"Amrood · Sebe hannu · Koyya · Peru",type:"fruit",regions:["S","W","C","E","N","NE"],months:[8,9,10,11,12],nutr:["vitC"],note:"Escaped from gardens into scrub and forest edges. Peeling bark and yellow-green fruit.",eat:"Fresh with chilli and salt, or as jelly.",store:"Make jelly or cheese.",methods:["leather"]},
+ {id:"monkeyjack",name:"Monkey jack",sci:"Artocarpus lacucha",local:"Lakuch · Vate huli · Otomba · Dehua",type:"fruit",regions:["S","E","NE","W"],months:[6,7,8],nutr:["vitC"],note:"Jackfruit cousin with lumpy orange fruit the size of a fist. Sweet-sour.",eat:"Ripe fresh. Dried slices as a souring agent in Ghats cooking.",store:"Slice and sun-dry.",methods:["salt"]},
+ {id:"kudampuli",name:"Malabar tamarind",sci:"Garcinia gummi-gutta",local:"Kudampuli · Uppage · Kodampuli",type:"fruit",regions:["S","W"],months:[6,7,8],nutr:[],note:"Ghats forest tree with ribbed yellow fruit. The souring for Kerala fish curry.",eat:"Fish curries and saaru.",store:"Smoke- or sun-dry the rind segments until black. Keeps a year or more.",methods:["salt"]},
+ {id:"hogplum",name:"Hog plum",sci:"Spondias pinnata",local:"Amra · Ambade · Amate · Ambazhanga",type:"fruit",regions:["S","E","NE","W","C"],months:[8,9,10,11],nutr:["vitC"],note:"Tall forest tree with clusters of sour, fibrous green-to-yellow fruit.",eat:"Ambade uppkari, amra chutney, pickles.",store:"Pickle in brine or oil.",methods:["pickle"]},
+ {id:"jalebi",name:"Jungle jalebi",sci:"Pithecellobium dulce",local:"Vilayati imli · Seemai puli · Kodukkapuli · Ganga imli",type:"fruit",regions:["S","W","C","E","N","D"],months:[3,4,5],nutr:["energy","protein"],note:"Thorny hedge tree with coiled pink-green pods holding sweet white pulp.",eat:"Pulp fresh, straight from the pod.",store:"Eat fresh.",warn:"Eat the pulp only, not the black seeds.",methods:[]},
+ {id:"elephantapple",name:"Elephant apple",sci:"Dillenia indica",local:"Ou tenga · Chalta · Uva",type:"fruit",regions:["NE","E","S"],months:[10,11,12,1],nutr:["vitC"],note:"Forest tree with huge pleated leaves and fist-sized green fruit with thick, sour fleshy layers.",eat:"Ou tenga dal and fish curry, chutney, pickle.",store:"Slice and sun-dry, or pickle.",methods:["salt","pickle"]},
+ {id:"sohiong",name:"Sohiong",sci:"Prunus jenkinsii",local:"Sohiong",type:"fruit",regions:["NE"],months:[9,10],nutr:[],note:"Meghalaya's wild cherry. Clusters of deep purple-black fruit.",eat:"Fresh, juice or wine.",store:"Make juice or jam.",methods:[]},
+ {id:"mulberry",name:"Mulberry",sci:"Morus",local:"Shahtoot · Hippunerale · Tuti",type:"fruit",regions:["N","H","S","E","C"],months:[3,4,5],nutr:["vitC","iron"],note:"Feral trees around old silk farms and canals. Blackberry-like fruit.",eat:"Fresh, jam, sharbat.",store:"Sun-dry, or make jam.",methods:["salt"]},
+ {id:"mehal",name:"Wild Himalayan pear",sci:"Pyrus pashia",local:"Mehal · Batangi · Kainth",type:"fruit",regions:["H"],months:[10,11,12],nutr:["energy"],note:"Small hill tree with hard, speckled brown pears.",eat:"Only once overripe and soft, then fresh.",store:"Let it soften in hay, then eat.",methods:[]},
+ {id:"kilmora",name:"Kilmora",sci:"Berberis asiatica",local:"Kilmora · Kingor · Chutro",type:"fruit",regions:["H"],months:[5,6,7],nutr:["vitC"],note:"Spiny Himalayan shrub with yellow wood and blue-black berries.",eat:"Ripe berries fresh, or jam.",store:"Sun-dry like raisins.",methods:["salt"]},
+ {id:"timla",name:"Timla",sci:"Ficus auriculata",local:"Timla · Timul · Trembal",type:"fruit",regions:["H","NE"],months:[5,6,7,8],nutr:["energy","iron"],note:"Hill fig with enormous leaves and clusters of big ribbed figs on the trunk.",eat:"Ripe fresh. Unripe as sabzi, curry or pickle.",store:"Split and sun-dry, or pickle unripe ones.",methods:["salt","pickle"]},
+ {id:"ghain",name:"Ghain",sci:"Elaeagnus umbellata",local:"Ghain · Kankoli",type:"fruit",regions:["H"],months:[7,8],nutr:["vitC"],note:"Silvery-leaved thorny shrub with small speckled red berries.",eat:"Fresh, or jam.",store:"Jam or juice.",methods:[]},
+ {id:"daru",name:"Wild pomegranate",sci:"Punica granatum",local:"Daru · Darim · Daruni",type:"fruit",regions:["H"],months:[9,10],nutr:["vitC"],note:"Hardy shrub of dry Himalayan slopes. Small, very sour fruit.",eat:"Seeds fresh, chutney.",store:"Sun-dry the seeds into anardana. Keeps a year or more.",methods:["salt"]},
+ {id:"apricot",name:"Wild apricot",sci:"Prunus armeniaca",local:"Chulu · Chulli · Zardalu",type:"fruit",regions:["H"],months:[6,7],nutr:["vitA","energy"],note:"Semi-wild apricot of Kinnaur, Ladakh and the high valleys.",eat:"Fruit fresh or dried.",store:"Halve, stone and sun-dry.",warn:"Never eat bitter kernels. They release cyanide. Sweet kernels from known trees are traditional.",methods:["salt"]},
+ {id:"chilgoza",name:"Chilgoza pine nuts",sci:"Pinus gerardiana",local:"Chilgoza · Neoza · Ri",type:"nut",regions:["H"],months:[9,10],nutr:["fat","protein","energy"],note:"Kinnaur's pine with large resinous cones holding long nuts.",eat:"Roasted, or raw.",store:"Keep in the shell. Lasts months.",warn:"Cone harvest belongs to local communities. Buy, don't collect.",methods:["seeds"]},
+ {id:"makhana",name:"Makhana",sci:"Euryale ferox",local:"Makhana · Fox nut · Gorgon nut",type:"nut",regions:["E","NE"],months:[8,9,10],nutr:["protein","energy"],note:"Spiny giant water lily of Mithila's ponds. Seeds are gathered from pond beds.",eat:"Popped and roasted, kheer, curry.",store:"Popped makhana keeps months airtight.",warn:"Harvesting means diving in muddy ponds. It's skilled work, so buy from local harvesters.",methods:["seeds"]},
+ {id:"bamboorice",name:"Bamboo rice",sci:"Bambusa bambos",local:"Mulayari · Bidiru akki · Moongil arisi",type:"starch",regions:["S","NE","E","C"],months:[3,4,5],nutr:["energy","protein"],note:"Seed from bamboo clumps that flower only once in decades, then die. Rare but abundant when it happens.",eat:"Cooked like rice, payasam.",store:"Dry well. Keeps like rice.",methods:["seeds"]},
+ {id:"suran",name:"Wild elephant foot yam",sci:"Amorphophallus paeoniifolius",local:"Jangli suran · Suvarna gadde · Chena · Ol",type:"starch",regions:["S","E","C","NE","W"],months:[11,12,1,2,3],nutr:["energy"],note:"Single umbrella-like leaf on a mottled stalk. Big flattened tuber underground.",eat:"Curry, fry, ol bhorta, chena erissery.",store:"Whole tubers keep for months in a cool, dry place.",warn:"Causes intense itching raw. Wild ones are harsher. Boil with tamarind or kokum.",methods:["detox"]},
+ {id:"tikhur",name:"Tikhur",sci:"Curcuma angustifolia",local:"Tikhur · Jangli aloo · East Indian arrowroot",type:"starch",regions:["C","E"],months:[12,1,2],nutr:["energy"],note:"Wild turmeric relative of central Indian forests. Starch is washed out of the rhizomes.",eat:"Tikhur halwa, barfi, or a cooling drink.",store:"Grate, wash, settle and dry the starch. Keeps a year.",methods:["powder"]},
+ {id:"redant",name:"Red ant chutney",sci:"Oecophylla smaragdina",local:"Kai chutney · Chaprah · Hao",type:"protein",regions:["C","E"],months:[11,12,1,2,3,4],nutr:["protein","iron"],note:"Weaver ants and their eggs, collected from leaf nests. Similipal kai chutney has a GI tag.",eat:"Ground with chilli, garlic and salt into chutney.",store:"Dry the chutney paste in the sun.",warn:"The ants bite hard. Learn from tribal collectors, and leave most of each nest.",methods:["salt"]},
+ {id:"crab",name:"Paddy crabs",sci:"Barytelphusa",local:"Kekda · Chimbori · Nandu · Kakra",type:"protein",regions:["E","NE","S","C","W"],months:[7,8,9,10],nutr:["protein","iron"],note:"Freshwater crabs caught in flooded paddy fields and streams in the monsoon.",eat:"Kekda curry, nandu rasam.",store:"Cook the same day.",warn:"Only from pesticide-free fields. Cook thoroughly, since they can carry lung flukes.",methods:[]}
+];
+P.push(
+ {id:"taro",name:"Wild taro corms",sci:"Colocasia esculenta",local:"Arbi · Kesuvina gadde · Seppankizhangu · Kosu",type:"root",regions:["S","W","E","NE"],months:[10,11,12,1,2],nutr:["energy"],note:"The underground corms of the same plant whose leaves make patra. Dug from wet ditches and paddy edges after the rains.",eat:"Boiled, then roasted, fried or in curry.",store:"Unwashed corms keep for weeks in a cool, dry place.",warn:"Itchy raw, and wild ones are harsher. Boil well, and add tamarind or kokum.",methods:["detox"]},
+ {id:"shatavari",name:"Wild asparagus shoots",sci:"Asparagus racemosus",local:"Shatavari · Satmuli · Kilwari · Narambu",type:"root",regions:["H","C","N","S","W","E"],months:[6,7,8],nutr:["vitA","vitC"],note:"Thorny climbing asparagus with needle-like leaves. Tender spear-like shoots come up in the monsoon.",eat:"Young shoots stir-fried or as sabzi.",store:"Use fresh, or blanch and freeze.",warn:"Take only a few shoots from each plant. The roots are harvested for medicine and the plant is declining in the wild.",methods:[]},
+ {id:"cane",name:"Cane shoots",sci:"Calamus tenuis",local:"Bet gaaj · Raidang · Chural",type:"root",regions:["NE","S"],months:[7,8,9],nutr:[],note:"Spiny climbing rattan palm. The soft white core of young shoots is a bitter Assamese delicacy.",eat:"Bet gaaj bhaji, or roasted in ashes and mashed into pitika.",store:"Use fresh.",warn:"Heavy spines. Peel carefully with a knife.",methods:[]},
+ {id:"palmtuber",name:"Palm tuber",sci:"Borassus flabellifer",local:"Panang kizhangu · Thati gegulu · Tal ankur",type:"root",regions:["S","E"],months:[12,1],nutr:["energy"],note:"Sprouted palmyra seeds pushed into sand grow a long starchy tuber in about three months. A Pongal-season snack.",eat:"Boiled with turmeric and salt, then peeled and eaten.",store:"Boil, split, sun-dry, and grind into flour (odiyal maavu).",methods:["powder"]},
+ {id:"vidari",name:"Vidarikand",sci:"Pueraria tuberosa",local:"Vidarikand · Bilaikand · Gumadi",type:"root",regions:["C","N","W","H"],months:[11,12,1,2],nutr:["energy"],note:"Big woody climber of dry forests with huge round tubers. Eaten by forest communities in central India.",eat:"Peeled tuber roasted, boiled or eaten raw in small pieces.",store:"Slice and sun-dry, then powder.",warn:"Learn from locals which tubers to dig, and leave mature plants.",methods:["powder"]},
+ {id:"jambu",name:"Jambu (Himalayan wild onion)",sci:"Allium stracheyi",local:"Jambu · Jimbu · Faran",type:"root",regions:["H"],months:[6,7,8],nutr:[],note:"Grass-like Himalayan onion leaves, dried and fried in ghee as a tempering for dal.",eat:"Tempering for dal, aloo and raita.",store:"Sun-dry the leaves. Keeps a year.",warn:"Threatened in the wild. Buy it from village growers rather than picking.",methods:["shade"]}
+);
+["yam","suran","tikhur","lotus","bamboo","fiddlehead"].forEach(id=>{const p=P.find(x=>x.id===id);if(p)p.type="root"});
+P.push(
+ {id:"wildrice",name:"Wild rice",sci:"Oryza rufipogon",local:"Nivara · Neevar · Uri dhan · Kattu nellu",type:"grain",regions:["C","E","S","W","N","NE"],months:[10,11,12],nutr:["energy","protein"],note:"Ancestor of cultivated rice, growing in ponds, ditches and lake edges. The awned grains shatter and fall as soon as they ripen. Sold as fasting rice (bhagar or nivara) in Maharashtra and the north.",eat:"Cooked like rice, or as fasting khichdi.",store:"Dry the grain fully, dehusk and store like rice. Keeps a year.",methods:["seeds"]},
+ {id:"junglerice",name:"Jungle rice",sci:"Echinochloa colona",local:"Sawa · Sanwak · Kuthiraivali (wild)",type:"grain",regions:["N","C","E","W","S","D","NE"],months:[9,10,11],nutr:["energy","iron"],note:"Wild ancestor of barnyard millet. A common grass of wet field edges, with purple-tinged seed heads in neat rows.",eat:"Cooked like millet or rice, porridge, fasting khichdi.",store:"Thresh, winnow and dry. Keeps months airtight.",methods:["seeds"]},
+ {id:"bhurat",name:"Bhurat",sci:"Cenchrus biflorus",local:"Bhurat · Bharut",type:"grain",regions:["D"],months:[9,10],nutr:["energy","protein","fat"],note:"Thar desert grass with spiny burs. Its seeds are rich in fat and protein, and were a lifeline in famine years.",eat:"Seeds ground and mixed with bajra flour for rotis.",store:"Dry and store the cleaned seeds.",warn:"The burs are very spiny. Use gloves and a sieve to separate the seeds.",methods:["seeds"]},
+ {id:"waterlily",name:"Water lily seeds",sci:"Nymphaea nouchali",local:"Shapla · Kumudini · Ambal · Bheti",type:"grain",regions:["E","S","NE","C"],months:[10,11,12,1],nutr:["energy","protein"],note:"Blue and white water lilies of village ponds. The fruit sinks and rots, freeing tiny seeds that pop like makhana.",eat:"Seeds popped in a hot pan (shapla khoi). Young stalks are cooked as a vegetable.",store:"Dry the seeds and store them airtight.",warn:"Only from clean ponds.",methods:["seeds"]},
+ {id:"wildmung",name:"Wild mung",sci:"Vigna radiata",local:"Jangli moong · Kaadu hesaru · Pillipesara",type:"grain",regions:["S","C","E","W"],months:[10,11,12],nutr:["protein","iron"],note:"Wild form of green gram, trailing over scrub and field bunds, with small hairy black pods. Smaller seeds than the farmed kind.",eat:"Dal, sprouts, or boiled with salt.",store:"Dry the pods, thresh, and store the seeds. Keeps a year.",methods:["seeds"]},
+ {id:"ricebean",name:"Rice bean",sci:"Vigna umbellata",local:"Naga dal · Sutri · Rajmash (hills)",type:"grain",regions:["NE","H","E"],months:[10,11,12],nutr:["protein","iron"],note:"Semi-wild climbing bean of Northeast and Himalayan jhum fields and forest edges, with yellow flowers and slim pods.",eat:"Dal, or cooked with pork in Nagaland and Manipur.",store:"Dry and store the seeds.",methods:["seeds"]},
+ {id:"mucuna",name:"Velvet bean",sci:"Mucuna pruriens",local:"Kaunch · Nasagunni · Poonaikkali",type:"grain",regions:["S","C","E","W"],months:[11,12,1,2],nutr:["protein","energy"],note:"Climbing bean with pods covered in golden itchy hairs. The large mottled seeds are eaten by some forest communities after long processing.",eat:"Only after soaking and boiling several times, changing the water each time.",store:"Dry the seeds in their shells.",warn:"The pod hairs cause intense itching, and the raw seeds are high in L-dopa. Never eat them without proper processing learned from locals.",methods:["detox"]},
+ {id:"siali",name:"Siali seeds",sci:"Phanera vahlii",local:"Siali · Mahul · Maljhan",type:"grain",regions:["C","E","H"],months:[3,4,5],nutr:["protein","fat","energy"],note:"Giant forest climber whose big leaves are stitched into leaf plates. Its large woody pods hold flat, nutty seeds.",eat:"Seeds roasted and eaten as a snack.",store:"Dry the seeds and store them in the shell.",methods:["seeds"]}
+);
+["bamboorice","kumat"].forEach(id=>{const p=P.find(x=>x.id===id);if(p)p.type="grain"});
+const DRINKS=[
+ {id:"kokumsharbat",name:"Kokum sharbat",uses:["kokum"],how:"Soak dried kokum rinds overnight, mash and strain. Add jaggery, a pinch of roasted cumin and salt, then top up with cold water.",yt:"kokum sharbat recipe"},
+ {id:"solkadhi",name:"Sol kadhi",uses:["kokum"],how:"Soak kokum in warm water, then mix the pink extract with coconut milk, crushed garlic, green chilli and salt. Drink chilled after meals.",yt:"sol kadhi recipe"},
+ {id:"aampanna",name:"Aam panna",uses:["mango"],how:"Boil or roast raw mangoes, scoop out the pulp and blend it with jaggery, roasted cumin, black salt and mint. Dilute with cold water.",yt:"aam panna recipe"},
+ {id:"amlajuice",name:"Amla juice",uses:["amla"],how:"Deseed amla, blend with water, ginger and a little honey or jaggery, then strain. Drink fresh, since vitamin C fades fast.",yt:"amla juice recipe"},
+ {id:"baelsharbat",name:"Bael sharbat",uses:["bael"],how:"Crack the shell, soak the pulp in water, mash, and strain out the seeds and fibres. Sweeten with jaggery and add a pinch of black salt.",yt:"bael sharbat recipe"},
+ {id:"kaithsharbat",name:"Wood apple sharbat",uses:["kaith"],how:"Scoop out the pulp, mash it in water with jaggery, strain, and add roasted cumin.",yt:"wood apple juice recipe"},
+ {id:"jamunjuice",name:"Jamun juice",uses:["jamun"],how:"Deseed ripe jamun, blend with water, lime, black salt and a little sugar. Strain and drink chilled.",yt:"jamun juice recipe"},
+ {id:"phalsa",name:"Phalsa sharbat",uses:["grewia"],how:"Mash ripe berries in water, strain out the seeds, then add sugar, black salt and roasted cumin.",yt:"phalsa sharbat recipe"},
+ {id:"karondasquash",name:"Karonda squash",uses:["karonda"],how:"Boil ripe karondas, strain, then cook the juice with sugar into a syrup. Dilute 1:4 with water to serve.",yt:"karonda juice recipe"},
+ {id:"buransh",name:"Buransh squash",uses:["buransh"],how:"Simmer red buransh petals in water, strain, then cook with sugar and lemon into a squash. Dilute to drink.",yt:"buransh juice recipe"},
+ {id:"seabuck",name:"Seabuckthorn juice",uses:["seabuckthorn"],how:"Crush berries, strain through cloth, and sweeten with honey. Very sour and full of vitamin C.",yt:"seabuckthorn juice recipe"},
+ {id:"berryjuice",name:"Himalayan berry juice",uses:["hisalu","kafal","kilmora","ghain"],how:"Crush ripe wild berries with a little water, strain, then add honey and a pinch of salt.",yt:"kafal juice recipe"},
+ {id:"mulberrysharbat",name:"Mulberry sharbat",uses:["mulberry"],how:"Mash ripe mulberries, strain, cook with sugar into a syrup, and dilute with chilled water and lime.",yt:"mulberry sharbat recipe"},
+ {id:"imli",name:"Imli sharbat",uses:["tamarind"],how:"Soak tamarind with jaggery, strain, then add roasted cumin, black salt and dry ginger. Dilute with cold water.",yt:"imli sharbat recipe"},
+ {id:"nungu",name:"Nungu drink",uses:["palmyra"],how:"Peel and chop tender nungu, then mix with its own juice, chilled milk or water, and a little rose syrup or sugar.",yt:"nungu sarbath recipe"},
+ {id:"neera",name:"Neera (fresh palm sap)",uses:["wilddate","palmyra"],how:"Collected at dawn from tapped palms and drunk straight away.",warn:"It ferments into toddy within hours. Tapping is licensed in many states, so buy from an official neera outlet.",yt:"neera palm sap"},
+ {id:"cashewjuice",name:"Cashew apple juice",uses:["cashew"],how:"Squeeze ripe cashew apples, then mix the juice with a little rice kanji or salt to cut the throat-catching astringency.",warn:"Fermented, it becomes feni, which is alcohol.",yt:"cashew apple juice recipe"},
+ {id:"moringatea",name:"Moringa tea",uses:["moringa"],how:"Steep a spoon of dried moringa leaves or powder in hot water for 5 minutes, and add lemon and honey.",yt:"moringa tea recipe"},
+ {id:"neermor",name:"Neer mor (spiced buttermilk)",uses:["curry"],how:"Whisk curd with water, crushed curry leaves, ginger, green chilli and salt.",yt:"neer mor recipe"},
+ {id:"ondelaga",name:"Ondelaga juice",uses:["pennywort"],how:"Blend a handful of pennywort leaves with water, jaggery and lime, then strain. Or grind them into buttermilk for tambuli.",yt:"ondelaga juice recipe"},
+ {id:"tikhurdrink",name:"Tikhur cooler",uses:["tikhur"],how:"Stir a spoon of tikhur starch into cold water or milk with sugar. A traditional summer cooler in Chhattisgarh.",yt:"tikhur sharbat"},
+ {id:"sohiongjuice",name:"Sohiong juice",uses:["sohiong"],how:"Crush the purple fruit with water and sugar, and strain.",yt:"sohiong juice meghalaya"},
+ {id:"matirajuice",name:"Matira juice",uses:["matira"],how:"Blend the flesh with a pinch of black salt and mint, and drink straight away.",yt:"watermelon juice recipe"},
+ {id:"nettletea",name:"Nettle tea",uses:["nettle"],how:"Steep fresh (gloved) or dried nettle leaves in hot water for 5–10 minutes.",yt:"nettle tea how to make"},
+ {id:"hogplumdrink",name:"Ambade cooler",uses:["hogplum"],how:"Boil ripe hog plums, mash, strain, and add jaggery, salt and a little chilli.",yt:"ambade juice recipe"}
+];
+const YT={moringa:"moringa leaves palya recipe",amaranth:"amaranth leaves stir fry recipe",bathua:"bathua saag recipe",purslane:"purslane kulfa saag recipe",woodsorrel:"wood sorrel chutney recipe",pennywort:"ondelaga chutney recipe",curry:"curry leaves podi recipe",colocasia:"patra colocasia leaves recipe",nettle:"kandali saag nettle recipe",fiddlehead:"lingdu fiddlehead fern recipe",bamboo:"bamboo shoot cleaning and cooking",amla:"amla pickle recipe",jamun:"jamun recipe",ber:"ilanthai vadai recipe",mango:"aam papad recipe homemade",jackfruit:"jackfruit seeds recipe",tamarind:"how to make tamarind block at home",bael:"bael sharbat recipe",fig:"atti kai gular fig sabzi recipe",karonda:"karonda pickle recipe",kokum:"sol kadhi kokum recipe",cashew:"cashew apple recipe",palmyra:"panang kizhangu palm tuber recipe",sangri:"ker sangri recipe",ker:"ker sangri recipe",lasoda:"lasoda pickle recipe",seabuckthorn:"seabuckthorn juice recipe",kafal:"kafal fruit uttarakhand",hisalu:"hisalu himalayan raspberry",walnut:"akhrot chutney recipe",chironji:"chironji recipe",almond:"indian almond terminalia catappa nut how to open",mahua:"mahua flower recipe",yam:"wild yam kand recipe",singhara:"singhara water chestnut recipe",lotus:"nadru yakhni lotus stem recipe",honey:"wild honey hunting india",shellfish:"tisryo clams masala recipe",snails:"gugli snail curry recipe",honagonne:"honagonne soppu recipe",spinyamaranth:"mullu keerai recipe",basale:"basale soppu recipe",kalmi:"kalmi saag recipe",chakoda:"chakoda bhaji recipe",kantola:"kantola sabzi recipe",ivygourd:"tondli sabzi recipe",bananaflower:"banana flower vada recipe",fishwort:"houttuynia cordata chutney northeast",culantro:"culantro chutney northeast recipe",treebean:"yongchak singju recipe",kachnar:"kachnar ki sabzi recipe",agathi:"agathi keerai poriyal recipe",buransh:"buransh juice recipe",neemflower:"ugadi pachadi recipe",phog:"phogla raita recipe",kachri:"kachri chutney recipe",matira:"sogra roti recipe",peelu:"peelu fruit rajasthan",kumat:"panchkuta recipe",kendu:"kendu fruit odisha",kusum:"kusum fruit recipe",wilddate:"nolen gur making",grewia:"phalsa sharbat recipe",kaith:"kaith chutney recipe",custardapple:"sitaphal pulp how to remove",guava:"guava jelly recipe",monkeyjack:"lakuch fruit",kudampuli:"kudampuli fish curry recipe",hogplum:"ambade uppkari recipe",jalebi:"jungle jalebi fruit",elephantapple:"ou tenga recipe",sohiong:"sohiong fruit meghalaya",mulberry:"mulberry jam recipe",mehal:"mehal fruit uttarakhand",kilmora:"kilmora berries",timla:"timla sabzi recipe",ghain:"elaeagnus umbellata berries",daru:"anardana making at home",apricot:"dry apricots at home",chilgoza:"chilgoza harvesting kinnaur",makhana:"makhana harvesting bihar",bamboorice:"bamboo rice recipe",suran:"suran sabzi recipe itching",tikhur:"tikhur barfi recipe",redant:"kai chutney red ant odisha",crab:"crab curry village recipe"};
+const YT_M={shade:"how to dry moringa leaves at home",powder:"moringa powder at home",salt:"amla candy sun dried",leather:"aam papad recipe homemade",pickle:"traditional indian pickle in oil recipe",seeds:"how to store jackfruit seeds",ferment:"fermented bamboo shoot making",flowers:"mahua flower drying",blanchdry:"how to dry sangri",detox:"how to clean and boil bamboo shoots"};
+Object.assign(YT,{wildrice:"bhagar rice khichdi recipe",junglerice:"sanwa rice khichdi recipe",bhurat:"bhurat grass seeds rajasthan",waterlily:"water lily seeds popcorn shapla",wildmung:"moong dal recipe village",ricebean:"rice bean dal recipe naga",mucuna:"mucuna seeds processing",siali:"siali seeds odisha",taro:"arbi fry recipe",shatavari:"wild asparagus shoots recipe india",cane:"bet gaaj recipe assam",palmtuber:"panang kizhangu recipe",vidari:"vidarikand tuber",jambu:"jambu tadka dal uttarakhand"});
+const HARVEST_T={
+ green:"Pinch off the young tips and top leaves with your fingers or scissors. Leave the lower leaves and roots so the plant regrows. Pick in the morning, away from roads and drains.",
+ fruit:"Pick fruit that comes away easily, or gather freshly fallen fruit. Don't break branches, and leave plenty for birds and animals.",
+ root:"Dig carefully with a trowel or digging stick. Take only part of a clump, and put the crown or a piece back in the soil so it regrows.",
+ starch:"Take only fully mature produce, and leave enough of the stand to come back next season.",
+ nut:"Collect ripe fallen fruit, nuts or cones from the ground. Dry them before cracking.",
+ flower:"Pick buds or petals, or gather fresh fallen flowers early in the morning. Leave enough on the plant to set fruit and seed.",
+ protein:"Follow local practice and seasonal bans. Take only large adults and leave the young.",
+ grain:"Wait until seed heads or pods are dry and ripe, then strip or shake them into a bag or onto a cloth before they shatter. Thresh, winnow and sun-dry the seeds well."};
+const HARVEST={
+ moringa:"Snap off whole leaf sprigs from the branch tips. Pruning like this makes the tree bushier. Pick pods while they still snap cleanly.",
+ bamboo:"Cut shoots 15–30 cm tall at ground level with a sharp knife, taking only one or two per clump, and only from village or private clumps.",
+ yam:"Follow the vine down and dig around the tuber. Traditionally the top of the tuber is left attached so it regrows. Go with someone who knows the safe species.",
+ suran:"Dig the tuber after the leaf dies back in winter. Wear gloves, since the sap itches.",
+ tikhur:"Dig rhizomes in winter after the leaves dry, and replant a few small pieces.",
+ taro:"Dig corms after the leaves yellow. Wear gloves. Replant the small side corms.",
+ nettle:"Wear gloves and long sleeves. Snip only the top four to six leaves of young plants.",
+ fiddlehead:"Snap off only tightly coiled tops about 15 cm long, taking one or two per crown so the fern survives.",
+ shatavari:"Snap young spears at 15–20 cm, and leave most of the plant's shoots to grow.",
+ jackfruit:"Ask the owner first. Cut the stalk with a knife oiled against the sticky latex, and lower heavy fruit with a rope.",
+ tamarind:"Knock down or collect pods once they're brown and brittle. They rattle when ripe.",
+ mahua:"Sweep up freshly fallen flowers at dawn on clean ground. Never burn leaf litter to clear it, which is a major cause of forest fires.",
+ honey:"Leave it to traditional honey hunters, who smoke the bees and take only part of the comb.",
+ cashew:"Gather fallen ripe apples, twist off the nut, and handle raw nuts with gloves.",
+ amla:"Shake branches over a cloth, or pick by hand. Don't lop branches.",
+ jamun:"Spread a sheet under the tree and gently shake the branches. Ripe fruit falls easily.",
+ ber:"Use a hooked stick and gloves, since the branches are thorny. Pick yellow-brown ripe fruit.",
+ kokum:"Collect fallen ripe purple fruit, or pick with a pole. Many trees are owned, so ask first.",
+ chironji:"Collect ripe purple fruit in summer, then remove the pulp and dry the stones before cracking.",
+ makhana:"Harvesting means diving into muddy ponds, so it's skilled work. Buy from local harvesters.",
+ shellfish:"Dig at low tide in clean estuary mudflats, taking only large clams, and never during the monsoon ban.",
+ redant:"Learn from tribal collectors, who knock part of a leaf nest into a basket and leave the rest.",
+ palmtuber:"Plant ripe palmyra seeds in a sand bed, then dig up the tubers about three months later.",
+ sangri:"Pick tender young green pods before they dry and harden.",
+ ker:"Pick half-ripe green berries. Wear gloves for the thorns.",
+ seabuckthorn:"Very thorny. Pick with gloves, or cut a few short fruiting twigs and freeze them to shake the berries off.",
+ chilgoza:"Cones are harvested under community rights in Kinnaur. Buy, don't collect.",
+ walnut:"Collect fallen nuts and peel the husk with gloves, because it stains badly.",
+ cane:"Cut young shoots with a sharp knife, wearing gloves against the spines.",
+ lotus:"Stems are pulled from pond mud by skilled harvesters. Buy unless you know the pond is clean.",
+ singhara:"Picked from floating plants by boat. Wear gloves, since the horns are sharp.",
+ kalmi:"Snip the tips above the water line from clean ponds only.",
+ buransh:"Gather fresh fallen flowers, or pick a few within reach. Never climb the trees.",
+ neemflower:"Spread a cloth under the tree and shake the branches gently.",
+ kachnar:"Pick plump buds before they open.",
+ mango:"Use a pole with a net (a mango picker) so the fruit doesn't bruise. Ask the owner.",
+ bael:"Wait for fruit to turn yellow and drop, or cut it with its stalk.",
+ colocasia:"Cut young unrolled leaves with their stalks, leaving the plant in place.",
+ bananaflower:"Cut the purple bud once the last banana hands have formed.",
+ snails:"Pick them by hand from pesticide-free flooded fields. Leave the small ones.",
+ crab:"Catch them by hand or with traps in pesticide-free fields. Leave females carrying eggs.",
+ jambu:"Buy from village growers. The wild plant is threatened."};
+const harvestText=p=>HARVEST[p.id]||HARVEST_T[p.type]||HARVEST_T.green;
+const ytURL=q=>"https://www.youtube.com/results?search_query="+encodeURIComponent(q);
+const METHODS=[
+ {id:"shade",name:"Shade-dry greens",keeps:"Keeps 3–6 months",steps:["Wash and shake dry, then pick off thick stems.","Spread thinly on a cotton cloth indoors or in the shade. Direct sun destroys vitamins A and C.","Turn daily for 3–5 days until the leaves crumble.","Store in an airtight glass jar away from light."]},
+ {id:"powder",name:"Grind into powder or podi",keeps:"Keeps 2–6 months",steps:["Start from fully crisp dried leaves, or dried tubers and kernels.","Grind fine in a mixie, and sieve if you like.","For podi, dry-roast with dal, chilli and salt before grinding.","Stir a spoon into dal, dough, rice or smoothies."]},
+ {id:"salt",name:"Salt and sun-dry",keeps:"Keeps 6–12 months",steps:["Slice or de-seed the fruit (amla, kokum, raw mango, tamarind).","Toss with salt. It draws out water and stops mould.","Dry in full sun on a clean sheet, bringing it in at night.","Store once it's leathery or brittle, with no moisture left."]},
+ {id:"leather",name:"Fruit leather (papad)",keeps:"Keeps 3–6 months",steps:["Cook ripe mango or jackfruit pulp with a little jaggery until thick.","Spread 3–4 mm thick on a greased plate.","Sun-dry for several days, adding layers if you like.","Cut into strips and store airtight."]},
+ {id:"pickle",name:"Pickle in salt and oil",keeps:"Keeps several months",steps:["Use a bone-dry jar and spoon. Water is what spoils pickles.","Cut the fruit (amla, mango, karonda, lasoda, ker), salt it, and leave it a day.","Add spices and heated, then cooled, mustard or sesame oil.","Keep the fruit under the oil."]},
+ {id:"seeds",name:"Store seeds and nuts",keeps:"Keeps months to a year",steps:["Jackfruit seeds: coat in wet mud, dry, and keep in a cool spot, or bury in dry sand.","Walnuts and Indian almonds: dry in the shell and crack as needed.","Chironji and roasted cashews: store shelled kernels airtight in the cool.","Check monthly for weevils."]},
+ {id:"ferment",name:"Ferment bamboo shoots",keeps:"Keeps months",steps:["Peel, slice and boil the shoots, then discard the water.","Pack tightly into a clean jar or bamboo tube and press out the air.","Leave 1–3 weeks until sour (khorisa, mesu, soibum).","Use as a sour flavouring in curries and chutneys."]},
+ {id:"flowers",name:"Dry mahua flowers",keeps:"Keeps about a year",steps:["Collect freshly fallen flowers early in the morning.","Sun-dry until shrivelled and dark.","Store in sacks or bins off the ground.","Soak before cooking with rice or making laddoos."]},
+ {id:"blanchdry",name:"Blanch and sun-dry",keeps:"Keeps a year or more",steps:["Boil sangri pods or soaked ker for a few minutes.","Drain and spread in full sun until hard and dry.","Store airtight.","Soak overnight, then boil before cooking."]},
+ {id:"detox",name:"Make it safe to eat",keeps:"Do this every time",steps:["Bamboo shoots and fiddleheads: boil and throw the water away.","Wild yams: slice thin, soak for a day in running water, then boil well.","Colocasia: cook thoroughly with tamarind or kokum.","Nettles: blanch. Ker: soak for days. Cashew: roast outdoors."]}
+];
+const DANGER=[
+ ["Datura","Dhatura · Ummatti","White or purple trumpet flowers and spiky seed pods on waste ground. Every part causes delirium and can kill."],
+ ["Yellow oleander","Peeli kaner · Kadu kanagile","Garden tree with yellow bell flowers and green fruit. The seeds are a common cause of fatal poisoning."],
+ ["Oleander","Kaner · Kanagile","Hedge shrub with pink or white flowers. All parts can stop the heart."],
+ ["Castor","Arandi · Haralu","Big hand-shaped leaves and spiny seed pods. The seeds are deadly if chewed."],
+ ["Rosary pea","Ratti · Gulaganji","Climber with glossy red-and-black seeds. A single chewed seed can be deadly."],
+ ["Calotropis","Aak · Ekka · Erukku","Roadside shrub with milky sap that burns the eyes and is poisonous."],
+ ["Lantana","Raimuniya","Scrub hedge with clusters of small flowers and black berries. Unripe berries and leaves are toxic."],
+ ["Wild mushrooms","Khumbi · Anabe · Kaalan · Rugda","Deadly species look like edible ones. Even tribal favourites like rugda have toxic lookalikes. Skip them unless an expert checks each one in person."],
+ ["Glory lily","Kalihari · Agnishikha · Kanvaali","Flame-coloured climbing lily whose V-shaped tubers are mistaken for wild yams. Deadly."],
+ ["Marking nut","Bhilawa · Geru beeja · Senkottai","Forest tree whose black nut oil causes severe burns and blisters. The fruit is sometimes eaten by locals, but it isn't safe to try."]
+];
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const state={st:store.get("fi-state")||"Karnataka",m:new Date().getMonth()+1,type:"all",mode:"now",q:"",nutr:"energy",sort:"avail"};
+if(!STATES[state.st])state.st="Karnataka";
+
+const regionsOf=()=>STATES[state.st];
+const inRegion=p=>p.regions.some(r=>regionsOf().includes(r));
+const inSeason=(p,m=state.m)=>p.months.includes(m);
+const mAt=k=>((state.m-1+k)%12)+1;
+const untilMonths=p=>{for(let k=0;k<12;k++)if(p.months.includes(mAt(k)))return k;return 99};
+const leftMonths=p=>{if(p.months.length===12)return 12;let k=0;while(k<12&&p.months.includes(mAt(k)))k++;return k};
+const availLabel=p=>{if(p.months.length===12)return "Available all year";const u=untilMonths(p);if(u===0){const l=leftMonths(p);return l===1?`Now · last month`:`Now · ${l} more months`}return `Back in ${MONTHS[mAt(u)-1]}`+(u===1?" (next month)":"")};
+const SORTS={avail:"Most available",ending:"Ending soon",az:"A–Z"};
+function sortList(list){const s=state.sort;return [...list].sort((a,b)=>{
+  if(s==="az")return a.name.localeCompare(b.name);
+  const ua=untilMonths(a),ub=untilMonths(b);
+  if(s==="ending"){if((ua===0)!==(ub===0))return ua===0?-1:1;if(ua===0)return leftMonths(a)-leftMonths(b)||a.name.localeCompare(b.name);return ua-ub||a.name.localeCompare(b.name)}
+  return ua-ub||leftMonths(b)-leftMonths(a)||b.months.length-a.months.length||a.name.localeCompare(b.name)})}
+const local=()=>P.filter(inRegion);
+const photoURL=p=>"https://commons.wikimedia.org/w/index.php?title=Special:MediaSearch&type=image&search="+encodeURIComponent(p.sci);
+const wikiURL=p=>"https://en.wikipedia.org/wiki/Special:Search?search="+encodeURIComponent(p.sci);
+const strip=p=>`<div class="months" aria-label="In season: ${p.months.map(m=>MONTHS[m-1]).join(", ")}">${MONTHS.map((n,i)=>`<span class="${p.months.includes(i+1)?"on":""} ${i+1===state.m?"now":""}">${n[0]}</span>`).join("")}</div>`;
+const tag=p=>`<span class="tag t-${p.type}">${TYPES[p.type]}</span>`;
+
+const LOOK=[
+ {p:["yam"],tw:"gloriosa",name:"Glory lily",sci:"Gloriosa superba",local:"Kalihari · Agnishikha · Kanvaali",sev:"Deadly",tells:["Glory lily leaves end in curling tendril tips. Wild yam leaves are heart-shaped, with no tendrils.","Glory lily has spectacular red-and-yellow wavy flowers. Yams have tiny, dull flowers.","Glory lily tubers are white and forked into a V or L shape. Yam tubers are rounded or long, and never forked."]},
+ {p:["colocasia","taro"],tw:"alocasia",name:"Giant taro (Alocasia)",sci:"Alocasia macrorrhizos",local:"Mankochu · Kattu chembu",sev:"Harmful raw",tells:["Colocasia's leaf stalk joins the leaf on its underside, near the centre. Alocasia's joins at the notch at the edge.","Colocasia leaves droop and water beads off them. Alocasia leaves stand up stiffly and are glossy.","Alocasia burns the mouth far worse and needs long cooking. Only eat it where locals cook that exact plant."]},
+ {p:["purslane"],tw:"spurge",name:"Asthma weed (spurge)",sci:"Euphorbia hirta",local:"Dudhi · Amman pacharisi · Nene akki soppu",sev:"Harmful",tells:["Snap a stem. Spurge oozes white milky sap. Purslane's sap is clear and watery.","Purslane stems and leaves are thick and fleshy. Spurge is thin and hairy.","Spurge has tiny greenish flower balls at the leaf joints. Purslane has small yellow flowers."]},
+ {p:["ivygourd"],tw:"diplocyclos",name:"Lollipop climber",sci:"Diplocyclos palmatus",local:"Shivlingi · Iyyakoovai",sev:"Toxic",tells:["Lollipop climber leaves are cut deeply into five narrow lobes. Ivy gourd leaves are only shallowly lobed.","Its fruit is round, bright red with white stripes, and grows in clusters. Ivy gourd fruit is oval, single, and green with pale stripes.","Ivy gourd has large white bell-shaped flowers. Lollipop climber has tiny yellowish ones."]},
+ {p:["fiddlehead"],tw:"bracken",name:"Bracken fern",sci:"Pteridium aquilinum",local:"",sev:"Harmful",tells:["Edible lingdu grows in clumps in wet ground near streams. Bracken grows as single stalks across dry, open hillsides.","Lingdu stems have a U-shaped groove on the inside, like celery. Bracken stems are round and fuzzy when young.","A bracken frond splits into three branches near the top. A lingdu frond is a single feather shape."]},
+ {p:["matira","kachri"],tw:"colocynth",name:"Bitter apple",sci:"Citrullus colocynthis",local:"Indrayan · Tumba · Kodumuttikai",sev:"Toxic",tells:["Bitter apple is fiercely bitter and a strong purgative. Even desert herders avoid it.","Its fruits are tennis-ball sized, smooth, green with yellow mottling, and turn yellow as they dry.","Its vines and leaves look very like matira, so only pick melons from vines a local has confirmed."]},
+ {p:["bael","kaith"],tw:"nuxvomica",name:"Nux vomica (kuchla)",sci:"Strychnos nux-vomica",local:"Kuchla · Kasarka · Etti",sev:"Deadly",tells:["Nux vomica fruit is smooth and orange with a thin, soft skin. Bael and wood apple have hard, woody shells you have to crack.","Its seeds are flat, grey, velvety discs like buttons, and contain strychnine.","Bael and wood apple trees have thorns. Nux vomica has glossy leaves with three strong veins."]},
+ {p:["karonda","jamun"],tw:"lantana",name:"Lantana",sci:"Lantana camara",local:"Raimuniya · Unnichedi · Kongini",sev:"Toxic",tells:["Lantana berries are small, glossy and black, in tight round clusters on a scrambling shrub. Karonda and jamun fruits are larger.","Lantana leaves are rough, toothed and strong-smelling, and its flowers come in pink, yellow and orange clusters.","Unripe green lantana berries are the most poisonous, especially for children."]},
+ {p:["curry"],tw:"orangejasmine",name:"Orange jasmine",sci:"Murraya paniculata",local:"Kamini · Madhukamini",sev:"Not food",tells:["Crush a leaf. Curry leaves have their strong, unmistakable smell, while orange jasmine barely smells.","Orange jasmine is a garden hedge with fragrant white flowers and red berries. Its leaflets are glossier and rounder.","A curry leaf has 11–21 smaller, pointed leaflets."]}
+];
+const lookFor=p=>LOOK.filter(l=>l.p.includes(p.id));
+const twinPic=l=>TWINS[l.tw]?`<figure class="lk-fig"><img src="img/tw_${l.tw}.webp" alt="${esc(l.name)}" loading="lazy"><figcaption><b class="bad">Not this: ${esc(l.name)}</b><br>Photo: ${esc(TWINS[l.tw].a)} · ${esc(TWINS[l.tw].l)} · <a href="${esc(TWINS[l.tw].s)}" target="_blank" rel="noopener">source</a></figcaption></figure>`:"";
+const ownPic=p=>CREDITS[p.id]?`<figure class="lk-fig"><img src="img/${p.id}.webp" alt="${esc(p.name)}" loading="lazy"><figcaption><b class="good">${esc(p.name)}</b></figcaption></figure>`:"";
+function lookBlock(p,l){return `<div class="lookalike"><div class="lk-head"><span class="sev">${esc(l.sev)}</span><h4>Don't confuse with ${esc(l.name)}</h4></div>
+ <div class="lk-sci">${esc(l.sci)}${l.local?" · "+esc(l.local):""}</div>
+ <div class="lk-pics">${ownPic(p)}${twinPic(l)}</div>
+ <ul>${l.tells.map(t=>`<li>${esc(t)}</li>`).join("")}</ul></div>`}
+const galleryOf=p=>[{src:`img/${p.id}.webp`,c:CREDITS[p.id]},...(GALLERY[p.id]||[]).map((g,i)=>({src:`img/${p.id}_${i+2}.webp`,c:g}))].filter(x=>x.c);
+function galleryHTML(p){const g=galleryOf(p);if(!g.length)return "";
+ const cap=c=>`Photo: ${esc(c.a)} · ${esc(c.l||"free licence")} · <a href="${esc(c.s)}" target="_blank" rel="noopener">Wikimedia Commons</a>`;
+ return `<figure class="hero"><img class="heroimg" id="heroimg" src="${g[0].src}" alt="${esc(p.name)}"><figcaption id="herocap">${cap(g[0].c)}</figcaption>
+ ${g.length>1?`<div class="thumbs">${g.map((x,i)=>`<button class="tb${i?"":" on"}" data-gsrc="${x.src}" data-gcap="${esc(cap(x.c))}" aria-label="Photo ${i+1}"><img src="${x.src}" alt="" loading="lazy"></button>`).join("")}</div>`:""}</figure>`}
+const dishSlug=n=>n.toLowerCase().replace(/\(.*?\)/g,"").replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
+
+const pic=(p,cls)=>CREDITS[p.id]?`<img class="${cls}" src="img/${p.id}.webp" alt="${esc(p.name)}" loading="lazy" decoding="async">`:"";
+function card(p){return `<button class="card" data-open="${p.id}">${pic(p,"thumb")}
+  <div class="top"><div><h3>${esc(p.name)}</h3><div class="local">${esc(p.local)}</div></div>${tag(p)}</div>
+  <div class="avail ${untilMonths(p)===0?"now":""}">${availLabel(p)}</div>
+  <p>${esc(p.note)}</p>${p.warn?`<div class="warnline">Caution: read before eating</div>`:""}${lookFor(p).length?`<div class="warnline">Has a dangerous lookalike</div>`:""}${strip(p)}</button>`}
+
+function nearList(){
+  const L=local();
+  let list=state.mode==="now"?L.filter(p=>inSeason(p)):L;
+  if(state.type!=="all")list=list.filter(p=>p.type===state.type);
+  if(state.q){const q=state.q.toLowerCase();list=list.filter(p=>(p.name+p.local+p.sci+p.note).toLowerCase().includes(q))}
+  return sortList(list);
+}
+function renderNearList(){
+  const list=nearList();
+  $("#near-count").textContent=`${list.length} ${list.length===1?"plant":"plants"}`;
+  $("#near-list").innerHTML=list.length?`<div class="grid">${list.map(card).join("")}</div>`:`<div class="empty">Nothing matches here${state.mode==="now"?" this month":""}. Try <b>All year</b>, another type, or clear the search.</div>`;
+  document.querySelectorAll("#v-near [data-mode]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===state.mode));
+  document.querySelectorAll("#v-near [data-type]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.type===state.type));
+}
+const TIP={upiId:"asit.eagle@oksbi",payee:"Asit Datar",qr:"img/upi-qr.png",amounts:[49,99,199]};
+function tipLink(n){return TIP.upiId?`upi://pay?pa=${TIP.upiId}&pn=${encodeURIComponent(TIP.payee)}&cu=INR&am=${n}&tn=${encodeURIComponent("Kokum sharbat")}`:""}
+function fundHTML(){
+ return `<section class="tip" id="tip" aria-labelledby="tip-h">
+  <div class="tip-copy">
+   <div class="eyebrow">Support</div>
+   <h2 id="tip-h">Feed the forager</h2>
+   <p>Enjoying Forage India? Tip whatever you like to keep it free and growing.</p>
+   ${TIP.upiId?`<a class="btn primary" href="upi://pay?pa=${TIP.upiId}&pn=${encodeURIComponent(TIP.payee)}&cu=INR&tn=${encodeURIComponent("Feed the forager")}">Pay with a UPI app</a>`:""}
+   ${TIP.upiId?`<div class="upi-id"><code id="upi">${esc(TIP.upiId)}</code><button class="chip" id="copyupi">Copy UPI ID</button></div>`:""}
+  </div>
+  <div class="tip-qr">${TIP.qr?`<img class="qr" src="${TIP.qr}" alt="UPI QR code">`:`<div class="qr qr-ph" role="img" aria-label="UPI QR code coming soon"><span>UPI QR code<br>coming soon</span></div>`}<div class="pay-h">Scan with any UPI app</div><div class="pay-apps">GPay · PhonePe · Paytm · BHIM</div></div>
+ </section>`}
+function renderNear(){
+  const L=local(), now=L.filter(p=>inSeason(p));
+  const regs=regionsOf().map(r=>REGION_NAMES[r]).join(" & ");
+  $("#v-near").innerHTML=`
+  <div class="intro"><h2>Wild in ${esc(state.st)} this ${MONTHS[state.m-1]}</h2>
+   <p class="stat"><b>${now.length}</b> in season now · ${L.length} in ${esc(regs)}</p></div>
+  <div class="near-body">
+  <div class="toolbar">
+   <div class="searchrow"><input id="q" class="search" type="search" placeholder="Search plants or local names" value="${esc(state.q)}" aria-label="Search plants">
+   <select id="sort" class="sortsel" aria-label="Sort">${Object.entries(SORTS).map(([k,v])=>`<option value="${k}" ${state.sort===k?"selected":""}>${v}</option>`).join("")}</select></div>
+   <div class="chiprow" role="toolbar" aria-label="Filters">
+    <div class="seg" role="group" aria-label="Season"><button data-mode="now" aria-pressed="${state.mode==="now"}">Now</button><button data-mode="all" aria-pressed="${state.mode==="all"}">All year</button></div>
+    <span class="vr" aria-hidden="true"></span>
+    ${["all",...Object.keys(TYPES)].map(t=>`<button class="chip" data-type="${t}" aria-pressed="${state.type===t}">${t==="all"?"All":TYPES[t]}</button>`).join("")}
+   </div>
+   <div class="count" id="near-count"></div>
+  </div>
+  <div id="near-list"></div>
+  </div>`;
+  $("#sort").onchange=e=>{state.sort=e.target.value;renderNearList()};
+  $("#q").addEventListener("input",e=>{state.q=e.target.value;renderNearList()});
+  renderNearList();
+}
+
+function renderNutrition(){
+  const n=NUTR[state.nutr], L=local().filter(p=>p.nutr.includes(state.nutr)).sort((a,b)=>(inSeason(b)-inSeason(a))||a.name.localeCompare(b.name));
+  const nowCount=L.filter(p=>inSeason(p)).length;
+  $("#v-nutrition").innerHTML=`
+  <div class="intro"><div><h2>Find your nutrition in ${esc(state.st)}</h2>
+  <p>Pick what you need. You'll see which wild foods in your region supply it, and whether they're in season in ${MONTHS[state.m-1]}.</p></div></div>
+  <div class="reality">
+   <div class="panel"><b class="big">~2,000+ kcal</b><p>A typical adult's daily energy need, more for hard physical work. Wild greens provide very little of it.</p></div>
+   <div class="panel"><b class="big">~50–60 g protein</b><p>A rough daily need for an adult. Few wild plants come close, so this is the hardest gap to fill.</p></div>
+   <div class="panel"><b class="big">Pair with staples</b><p>Use forage to add vitamins, minerals and flavour to rice, millets, ragi or dal. Living on wild food alone is not realistic for most people.</p></div>
+  </div>
+  <div class="nutri-pick" role="group" aria-label="Nutrient">${Object.entries(NUTR).map(([k,v])=>`<button data-nutr="${k}" aria-pressed="${state.nutr===k}"><b>${v.name}</b><small>${v.blurb}</small></button>`).join("")}</div>
+  <div class="panel"><h3>${n.name}</h3><p>${n.long}</p>
+   <p><b>${nowCount}</b> of ${L.length} sources in your region are in season now.</p>
+   <div class="list">${L.length?L.map(p=>`<button class="row" data-open="${p.id}"><span><b>${esc(p.name)}</b><br><span class="why">${esc(p.local.split(" · ")[0])} · ${p.months.length===12?"all year":p.months.map(m=>MONTHS[m-1]).join(", ")}</span></span><span class="pill ${inSeason(p)?"now":"later"}">${inSeason(p)?"In season":"Later"}</span></button>`).join(""):`<div class="empty">No strong wild source in your region. Buy this one.</div>`}</div>
+  </div>`;
+}
+
+const COURSES=[["drink","Drinks & juices"],["starter","Starters & snacks"],["side","Chutneys, pickles & raitas"],["main","Main course"],["bread","Breads & rice"],["dessert","Desserts"]];
+const R=[
+ ...DRINKS.map(d=>({c:"drink",n:d.name,u:d.uses,d:d.how,w:d.warn,yt:d.yt})),
+ {c:"starter",n:"Agase hoovina bajji",u:["agathi"],d:"Agathi flowers dipped in spiced besan batter and fried crisp. A Karnataka monsoon snack.",yt:"agase hoovina bajji recipe"},
+ {c:"starter",n:"Vazhaipoo vadai",u:["bananaflower"],d:"Chopped banana flower in a coarse chana dal batter with onion and curry leaves, shallow-fried.",yt:"vazhaipoo vadai recipe"},
+ {c:"starter",n:"Drumstick leaf pakoda",u:["moringa"],d:"Moringa leaves stirred into besan with onion and chilli, fried in small fritters.",yt:"drumstick leaves pakoda recipe"},
+ {c:"starter",n:"Alu vadi / patra / pathrode",u:["colocasia"],d:"Colocasia leaves layered with spiced gram or rice batter, rolled, steamed, sliced and tempered.",w:"Cook thoroughly with tamarind or kokum.",yt:"pathrode recipe"},
+ {c:"starter",n:"Basale pakoras",u:["basale"],d:"Whole Malabar spinach leaves dipped in batter and fried.",yt:"basale soppu bajji recipe"},
+ {c:"starter",n:"Ilanthai vadai",u:["ber"],d:"Dried ber pounded with jaggery, chilli and salt, then pressed into sweet-sour sun-dried discs. Tamil Nadu's school-gate snack.",yt:"ilanthai vadai recipe"},
+ {c:"starter",n:"Jackfruit chips",u:["jackfruit"],d:"Firm unripe bulbs sliced thin and fried in coconut oil with salt.",yt:"jackfruit chips recipe"},
+ {c:"starter",n:"Roasted jackfruit seeds",u:["jackfruit"],d:"Seeds roasted in hot sand or a pan, then peeled and salted. Nutty and filling.",yt:"roasted jackfruit seeds"},
+ {c:"starter",n:"Panang kizhangu",u:["palmtuber"],d:"Palm tubers boiled with turmeric and salt, peeled and eaten warm.",yt:"panang kizhangu recipe"},
+ {c:"starter",n:"Roasted makhana",u:["makhana"],d:"Fox nuts tossed in ghee with salt, pepper and chaat masala until crunchy.",yt:"roasted makhana recipe"},
+ {c:"starter",n:"Boiled singhara",u:["singhara"],d:"Fresh water chestnuts boiled in their shells, peeled and sprinkled with salt.",yt:"boiled singhara"},
+ {c:"starter",n:"Kamal kakdi chips",u:["lotus"],d:"Thinly sliced lotus stem, fried crisp with chilli and salt.",yt:"lotus stem chips recipe"},
+ {c:"starter",n:"Arbi fry",u:["taro"],d:"Boiled taro corms pan-fried with ajwain, chilli and amchur.",yt:"arbi fry recipe"},
+ {c:"starter",n:"Suran cutlets",u:["suran"],d:"Boiled elephant foot yam mashed with spices, shaped and pan-fried.",w:"Boil with tamarind first so it doesn't itch.",yt:"suran cutlet recipe"},
+ {c:"starter",n:"Singju",u:["treebean","culantro","fishwort"],d:"Manipuri salad of sliced tree bean, wild herbs and cabbage, dressed with roasted chilli and perilla.",yt:"singju recipe manipur"},
+ {c:"starter",n:"Purslane salad",u:["purslane"],d:"Tender purslane tips with onion, tomato, lime and roasted peanuts.",yt:"purslane salad recipe indian"},
+ {c:"side",n:"Kai chutney",u:["redant"],d:"Red ants and eggs ground with chilli, garlic, ginger and salt. Similipal's GI-tagged chutney.",yt:"kai chutney recipe"},
+ {c:"side",n:"Kaith chutney",u:["kaith"],d:"Wood apple pulp ground with jaggery, green chilli and roasted cumin.",yt:"kaith chutney recipe"},
+ {c:"side",n:"Kachri chutney",u:["kachri"],d:"Dried kachri ground with garlic, red chilli and salt. Fiery Rajasthani chutney.",yt:"kachri chutney recipe"},
+ {c:"side",n:"Thankuni bata / ondelaga chutney",u:["pennywort"],d:"Pennywort ground with coconut, green chilli and a little tamarind.",yt:"ondelaga chutney recipe"},
+ {c:"side",n:"Karibevu podi",u:["curry"],d:"Dry-roasted curry leaves with urad dal, chilli and tamarind, ground to a powder for rice and dosa.",yt:"curry leaves podi recipe"},
+ {c:"side",n:"Amla pickle",u:["amla"],d:"Steamed amla in mustard oil with fenugreek, mustard and chilli.",yt:"amla pickle recipe"},
+ {c:"side",n:"Karonda pickle",u:["karonda"],d:"Halved karondas salted, then tossed in mustard oil with fennel and nigella.",yt:"karonda pickle recipe"},
+ {c:"side",n:"Lasoda pickle",u:["lasoda"],d:"Green lasoda berries pickled in mustard oil with fennel and turmeric.",yt:"lasoda pickle recipe"},
+ {c:"side",n:"Appe midi uppinakai",u:["mango"],d:"Whole tender wild mangoes brined with mustard, chilli and turmeric. Malnad's prized pickle.",yt:"appe midi pickle recipe"},
+ {c:"side",n:"Ambade uppkari",u:["hogplum"],d:"Hog plums cooked with jaggery, chilli and mustard. A sweet-sour Konkani side.",yt:"ambade uppkari recipe"},
+ {c:"side",n:"Ou tenga chutney",u:["elephantapple"],d:"Elephant apple layers boiled and mashed with mustard oil, chilli and salt.",yt:"ou tenga chutney"},
+ {c:"side",n:"Lingdu pickle",u:["fiddlehead"],d:"Boiled fiddleheads in mustard oil with lemon, chilli and salt.",yt:"lingdu pickle recipe"},
+ {c:"side",n:"Timla pickle",u:["timla"],d:"Unripe hill figs boiled, then pickled with mustard and chilli.",yt:"timla pickle recipe"},
+ {c:"side",n:"Akhrot chutney",u:["walnut"],d:"Walnuts ground with curd, green chilli, mint and salt. A Kashmiri favourite.",yt:"akhrot chutney recipe"},
+ {c:"side",n:"Imli chutney",u:["tamarind"],d:"Tamarind cooked down with jaggery, dry ginger and roasted cumin.",yt:"imli chutney recipe"},
+ {c:"side",n:"Huli soppu chutney",u:["woodsorrel"],d:"Wood sorrel ground with coconut, chilli and a little jaggery. Small portions only.",yt:"wood sorrel chutney recipe"},
+ {c:"side",n:"Phogla raita",u:["phog"],d:"Soaked phog buds stirred into whisked curd with cumin and salt.",yt:"phogla raita recipe"},
+ {c:"side",n:"Bathua raita",u:["bathua"],d:"Boiled, chopped bathua folded into curd with roasted cumin.",yt:"bathua raita recipe"},
+ {c:"side",n:"Ugadi pachadi",u:["neemflower","mango","tamarind"],d:"Neem flowers, raw mango, tamarind, jaggery, salt and chilli: six tastes in one spoonful for the new year.",yt:"ugadi pachadi recipe"},
+ {c:"main",n:"Shevgyachya shenganchi amti",u:["moringa","tamarind"],d:"Maharashtrian drumstick amti: toor dal with goda masala, kokum or tamarind and a touch of jaggery.",yt:"shevgyachya shenganchi amti recipe"},
+ {c:"main",n:"Chinch-gulachi amti",u:["tamarind"],d:"Sweet-sour tamarind and jaggery dal with goda masala. A Pune and Konkan staple.",yt:"chinch gulachi amti recipe"},
+ {c:"side",n:"Karvandachi chutney",u:["karonda"],d:"Raw karvanda ground with green chilli, jaggery and salt. A Maharashtrian monsoon side.",yt:"karvanda chutney recipe"},
+ {c:"main",n:"Nugge soppu palya",u:["moringa"],d:"Moringa leaves stir-fried with mustard, urad dal, onion and grated coconut.",yt:"nugge soppu palya recipe"},
+ {c:"main",n:"Drumstick sambar",u:["moringa","tamarind"],d:"Toor dal and tamarind sambar with drumstick pods simmered until tender.",yt:"drumstick sambar recipe"},
+ {c:"main",n:"Dantu soppu saaru",u:["amaranth"],d:"Amaranth simmered with dal, tamarind and rasam powder, tempered with garlic.",yt:"dantu soppu saaru recipe"},
+ {c:"main",n:"Bathua saag",u:["bathua","nettle"],d:"Bathua slow-cooked with mustard greens, garlic and makki atta, finished with ghee.",yt:"bathua saag recipe"},
+ {c:"main",n:"Basale bassaru",u:["basale"],d:"Malabar spinach and dal stock as a spicy saaru, with the greens as palya. Two dishes from one pot.",yt:"basale bassaru recipe"},
+ {c:"main",n:"Honagonne saaru",u:["honagonne"],d:"Sessile joyweed in a light dal saaru with garlic tempering.",yt:"honagonne soppu saaru"},
+ {c:"main",n:"Kandali saag",u:["nettle"],d:"Blanched nettles cooked with garlic, chilli and a little rice flour. A Kumaoni winter dish.",yt:"kandali saag recipe"},
+ {c:"main",n:"Kalmi saag",u:["kalmi"],d:"Water spinach stir-fried with nigella, garlic and dry chilli.",yt:"kalmi saag recipe"},
+ {c:"main",n:"Takla bhaji / chakoda bhaji",u:["chakoda"],d:"Tender senna leaves cooked dry with onion, garlic and besan.",yt:"chakoda bhaji recipe"},
+ {c:"main",n:"Kartoli bhaji / kantola sabzi",u:["kantola"],d:"Sliced spiny gourd stir-fried with onion and spices, or stuffed and fried.",yt:"kantola sabzi recipe"},
+ {c:"main",n:"Tondli bhaji",u:["ivygourd"],d:"Ivy gourd slices cooked with peanuts, coconut and goda masala.",yt:"tondli sabzi recipe"},
+ {c:"main",n:"Ker sangri",u:["ker","sangri"],d:"Dried ker berries and sangri beans soaked, boiled and cooked with yoghurt, red chilli and amchur.",yt:"ker sangri recipe"},
+ {c:"main",n:"Panchkuta",u:["ker","sangri","kachri","kumat","lasoda"],d:"The Thar's five-ingredient desert curry, cooked dry with spices and oil.",yt:"panchkuta recipe"},
+ {c:"main",n:"Kachnar ki sabzi",u:["kachnar"],d:"Blanched kachnar buds cooked with onion, curd and garam masala.",yt:"kachnar ki sabzi recipe"},
+ {c:"main",n:"Kathal biryani",u:["jackfruit"],d:"Raw jackfruit chunks layered with rice and whole spices. It eats like meat.",yt:"kathal biryani recipe"},
+ {c:"main",n:"Kalale palya",u:["bamboo"],d:"Boiled bamboo shoots cooked dry with coconut and chilli. A Malnad monsoon dish.",w:"Boil and discard the water first.",yt:"kalale palya recipe"},
+ {c:"main",n:"Bamboo shoot pork",u:["bamboo"],d:"Pork cooked with fermented bamboo shoot and chilli. A Naga and Assamese classic.",yt:"bamboo shoot pork recipe"},
+ {c:"main",n:"Bet gaaj bhaji",u:["cane"],d:"Bitter cane shoot core stir-fried with potato and mustard oil.",yt:"bet gaaj recipe"},
+ {c:"main",n:"Lingdu bhaji",u:["fiddlehead"],d:"Fiddleheads boiled, then stir-fried with garlic, cumin and chilli.",yt:"lingdu sabzi recipe"},
+ {c:"main",n:"Nadru yakhni",u:["lotus"],d:"Lotus stem in a fennel and dry-ginger yoghurt gravy. Kashmiri.",yt:"nadru yakhni recipe"},
+ {c:"main",n:"Chena erissery",u:["suran"],d:"Elephant foot yam with black-eyed beans in roasted coconut. A Kerala Onam dish.",yt:"chena erissery recipe"},
+ {c:"main",n:"Wild yam curry",u:["yam"],d:"Soaked and boiled yam chunks in a coconut or mustard curry.",w:"Only safe species, soaked and boiled well.",yt:"kand curry recipe"},
+ {c:"main",n:"Eromba with yongchak",u:["treebean"],d:"Manipuri mash of boiled tree bean, potato, fermented fish and fiery chilli.",yt:"eromba recipe"},
+ {c:"main",n:"Kudampuli fish curry",u:["kudampuli"],d:"Kerala red fish curry soured with smoked Malabar tamarind.",yt:"kudampuli fish curry recipe"},
+ {c:"main",n:"Kokum saaru",u:["kokum"],d:"Thin, tangy kokum rasam tempered with ghee and cumin.",yt:"kokum saaru recipe"},
+ {c:"main",n:"Ou tenga dal",u:["elephantapple"],d:"Masoor dal soured with elephant apple slices. Assamese summer comfort.",yt:"ou tenga dal recipe"},
+ {c:"main",n:"Puliyogare",u:["tamarind","curry"],d:"Rice tossed in a thick tamarind paste with sesame, peanuts and curry leaves.",yt:"puliyogare recipe"},
+ {c:"main",n:"Veppam poo rasam",u:["neemflower","tamarind"],d:"Fried neem flowers in a tamarind rasam. Bitter, sour and soothing.",yt:"veppam poo rasam recipe"},
+ {c:"main",n:"Tisryo masala",u:["shellfish"],d:"Clams on the half shell cooked dry with coconut and Goan spices.",yt:"tisryo masala recipe"},
+ {c:"main",n:"Nandu rasam / kekda curry",u:["crab"],d:"Paddy crabs in a peppery rasam or a thick coconut curry.",yt:"nandu rasam recipe"},
+ {c:"main",n:"Gugli curry",u:["snails"],d:"Boiled, cleaned snails in a spicy onion-garlic gravy. Odisha and Bengal.",w:"Boil thoroughly.",yt:"gugli curry recipe"},
+ {c:"main",n:"Jambu tadka dal",u:["jambu"],d:"Dal finished with jambu leaves sizzled in ghee. The Garhwali signature.",yt:"jambu tadka dal"},
+ {c:"main",n:"Shatavari stir-fry",u:["shatavari"],d:"Wild asparagus spears tossed in mustard oil with garlic.",yt:"wild asparagus stir fry indian"},
+ {c:"main",n:"Atti kai palya",u:["fig"],d:"Unripe cluster figs boiled and cooked dry with coconut.",yt:"atti kai palya recipe"},
+ {c:"main",n:"Mahua bhat",u:["mahua"],d:"Dried mahua flowers cooked into rice for natural sweetness. A tribal staple.",yt:"mahua flower rice"},
+ {c:"bread",n:"Bathua paratha",u:["bathua"],d:"Chopped bathua kneaded into wheat dough with ajwain, rolled and roasted with ghee.",yt:"bathua paratha recipe"},
+ {c:"bread",n:"Moringa thepla",u:["moringa"],d:"Soft flatbreads of wheat and besan with moringa leaves and spices.",yt:"moringa thepla recipe"},
+ {c:"bread",n:"Sogra",u:["matira"],d:"Thick bajra rotis made with ground matira seeds. Desert winter fare.",yt:"sogra roti recipe"},
+ {c:"bread",n:"Singhara atta puri",u:["singhara"],d:"Water chestnut flour puris, eaten on fasting days.",yt:"singhara atta puri recipe"},
+ {c:"bread",n:"Wild greens dosa",u:["amaranth","basale","honagonne"],d:"Ground rice and dal batter with a handful of greens. No fermentation needed.",yt:"greens dosa recipe"},
+ {c:"bread",n:"Bhagar / nivara khichdi",u:["wildrice","junglerice"],d:"Wild rice or jungle rice cooked with peanuts, cumin, green chilli and ghee. The classic fasting meal.",yt:"bhagar khichdi recipe"},
+ {c:"starter",n:"Shapla khoi",u:["waterlily"],d:"Water lily seeds popped in a hot pan like tiny popcorn, then salted.",yt:"water lily seeds popcorn"},
+ {c:"starter",n:"Roasted siali seeds",u:["siali"],d:"Siali seeds roasted in their shells, then cracked and eaten warm. A tribal Odisha snack.",yt:"siali seeds roasting"},
+ {c:"main",n:"Wild mung dal",u:["wildmung"],d:"Small wild green gram cooked into a simple dal with garlic and cumin tempering.",yt:"moong dal tadka recipe"},
+ {c:"main",n:"Rice bean with pork",u:["ricebean"],d:"Naga-style rice bean slow-cooked with smoked pork and chilli.",yt:"naga rice bean pork recipe"},
+ {c:"bread",n:"Bhurat roti",u:["bhurat"],d:"Ground bhurat seeds mixed into bajra flour and patted into thick rotis. Desert famine fare.",yt:"bajra roti recipe"},
+ {c:"bread",n:"Bamboo rice",u:["bamboorice"],d:"Cooked like ordinary rice, with a nutty, sticky bite.",yt:"bamboo rice cooking"},
+ {c:"dessert",n:"Mahua laddoo",u:["mahua"],d:"Dried mahua flowers roasted and pounded with roasted grains and sesame.",yt:"mahua laddu recipe"},
+ {c:"dessert",n:"Tikhur barfi",u:["tikhur"],d:"Tikhur starch cooked with milk and sugar until it sets, then cut into squares. Chhattisgarh's festival sweet.",yt:"tikhur barfi recipe"},
+ {c:"dessert",n:"Bamboo rice payasam",u:["bamboorice"],d:"Bamboo rice simmered in coconut milk and jaggery with cardamom.",yt:"bamboo rice payasam recipe"},
+ {c:"dessert",n:"Makhana kheer",u:["makhana","chironji"],d:"Roasted fox nuts simmered in milk with sugar, cardamom and chironji.",yt:"makhana kheer recipe"},
+ {c:"dessert",n:"Aam papad",u:["mango"],d:"Mango pulp and jaggery sun-dried in thin layers into fruit leather.",yt:"aam papad recipe"},
+ {c:"dessert",n:"Amla murabba",u:["amla"],d:"Whole amla slow-cooked in sugar syrup with cardamom.",yt:"amla murabba recipe"},
+ {c:"dessert",n:"Chakka varatti",u:["jackfruit"],d:"Ripe jackfruit cooked down with jaggery and ghee into a dark jam. Kerala.",yt:"chakka varatti recipe"},
+ {c:"dessert",n:"Jamun sorbet",u:["jamun"],d:"Jamun pulp blended with sugar, lime and black salt, then frozen.",yt:"jamun sorbet recipe"},
+ {c:"dessert",n:"Mulberry jam",u:["mulberry"],d:"Mulberries cooked with sugar and lemon until thick.",yt:"mulberry jam recipe"},
+ {c:"dessert",n:"Guava cheese",u:["guava"],d:"Guava pulp cooked with sugar and butter until it sets, then cut. A Goan Christmas sweet.",yt:"guava cheese recipe goan"},
+ {c:"dessert",n:"Himalayan berry jam",u:["hisalu","kilmora","ghain","kafal"],d:"Wild hill berries cooked with sugar into jam.",yt:"hisalu jam"},
+ {c:"dessert",n:"Sitaphal basundi",u:["custardapple"],d:"Custard apple pulp folded into reduced, sweetened milk.",yt:"sitaphal basundi recipe"},
+ {c:"dessert",n:"Nolen gur sandesh",u:["wilddate"],d:"Fresh chhena kneaded with date-palm jaggery. Bengal's winter sweet.",yt:"nolen gur sandesh recipe"},
+ {c:"dessert",n:"Chironji barfi",u:["chironji"],d:"Toasted chironji in a milk and sugar fudge.",yt:"chironji barfi recipe"}
+];
+const HOME={"Kokum sharbat": ["W", "S"], "Sol kadhi": ["W", "S"], "Aam panna": ["N", "W", "C"], "Amla juice": ["N", "W", "S"], "Bael sharbat": ["N", "E", "C"], "Wood apple sharbat": ["S", "W", "E"], "Jamun juice": ["N", "W"], "Phalsa sharbat": ["N", "D"], "Karonda squash": ["W", "C"], "Buransh squash": ["H"], "Seabuckthorn juice": ["H"], "Himalayan berry juice": ["H"], "Mulberry sharbat": ["N", "H"], "Imli sharbat": ["N", "C", "S"], "Nungu drink": ["S"], "Neera (fresh palm sap)": ["S", "W", "E"], "Cashew apple juice": ["W", "S"], "Neer mor (spiced buttermilk)": ["S"], "Ondelaga juice": ["S"], "Tikhur cooler": ["C"], "Sohiong juice": ["NE"], "Matira juice": ["D"], "Nettle tea": ["H"], "Ambade cooler": ["S", "W"], "Agase hoovina bajji": ["S"], "Vazhaipoo vadai": ["S"], "Drumstick leaf pakoda": ["S", "W"], "Alu vadi / patra / pathrode": ["W", "S"], "Basale pakoras": ["S"], "Ilanthai vadai": ["S"], "Jackfruit chips": ["S"], "Roasted jackfruit seeds": ["S", "W", "E"], "Panang kizhangu": ["S"], "Roasted makhana": ["E", "N"], "Boiled singhara": ["N", "E", "C"], "Kamal kakdi chips": ["N", "H"], "Arbi fry": ["N", "W"], "Suran cutlets": ["W", "E"], "Singju": ["NE"], "Kai chutney": ["E", "C"], "Kaith chutney": ["E", "C", "N"], "Kachri chutney": ["D"], "Thankuni bata / ondelaga chutney": ["S", "E"], "Karibevu podi": ["S"], "Amla pickle": ["N", "W"], "Karonda pickle": ["W", "C", "N"], "Lasoda pickle": ["D", "N"], "Appe midi uppinakai": ["S"], "Ambade uppkari": ["S", "W"], "Ou tenga chutney": ["NE"], "Lingdu pickle": ["H", "NE"], "Timla pickle": ["H"], "Akhrot chutney": ["H"], "Imli chutney": ["N", "C", "W"], "Huli soppu chutney": ["S"], "Phogla raita": ["D"], "Bathua raita": ["N", "H"], "Ugadi pachadi": ["S"], "Karvandachi chutney": ["W"], "Shevgyachya shenganchi amti": ["W"], "Chinch-gulachi amti": ["W"], "Nugge soppu palya": ["S"], "Drumstick sambar": ["S"], "Dantu soppu saaru": ["S"], "Bathua saag": ["N"], "Basale bassaru": ["S"], "Honagonne saaru": ["S"], "Kandali saag": ["H"], "Kalmi saag": ["E"], "Takla bhaji / chakoda bhaji": ["W", "C"], "Kartoli bhaji / kantola sabzi": ["W", "E", "N"], "Tondli bhaji": ["W", "S"], "Ker sangri": ["D"], "Panchkuta": ["D"], "Kachnar ki sabzi": ["N", "H"], "Kathal biryani": ["N", "E"], "Kalale palya": ["S"], "Bamboo shoot pork": ["NE"], "Bet gaaj bhaji": ["NE"], "Lingdu bhaji": ["H"], "Nadru yakhni": ["H"], "Chena erissery": ["S"], "Wild yam curry": ["E", "C", "S"], "Eromba with yongchak": ["NE"], "Kudampuli fish curry": ["S"], "Kokum saaru": ["S", "W"], "Ou tenga dal": ["NE"], "Puliyogare": ["S"], "Veppam poo rasam": ["S"], "Tisryo masala": ["W"], "Nandu rasam / kekda curry": ["S", "E", "W"], "Gugli curry": ["E"], "Jambu tadka dal": ["H"], "Atti kai palya": ["S"], "Mahua bhat": ["C", "E"], "Bathua paratha": ["N"], "Moringa thepla": ["W"], "Sogra": ["D"], "Singhara atta puri": ["N", "C"], "Wild greens dosa": ["S"], "Bamboo rice": ["S"], "Mahua laddoo": ["C", "E"], "Tikhur barfi": ["C"], "Bamboo rice payasam": ["S"], "Makhana kheer": ["E", "N"], "Aam papad": ["N", "W", "D"], "Amla murabba": ["N"], "Chakka varatti": ["S"], "Mulberry jam": ["H", "N"], "Guava cheese": ["W"], "Himalayan berry jam": ["H"], "Sitaphal basundi": ["W"], "Nolen gur sandesh": ["E"], "Chironji barfi": ["C", "W"]};
+R.forEach(r=>{r.h=HOME[r.n]||[]});
+const isHome=r=>r.h.some(x=>regionsOf().includes(x));
+const homeScore=r=>{const rg=regionsOf();if(!r.h.length)return 0;const own=r.h[0]===rg[0]?3:r.h.includes(rg[0])?2:r.h.some(x=>rg.includes(x))?1:0;return own};
+const rPlants=r=>r.u.map(id=>P.find(p=>p.id===id)).filter(Boolean);
+const rUntil=r=>{const l=rPlants(r).filter(inRegion);return l.length?Math.min(...l.map(untilMonths)):99};
+function menuItem(r){const u=rUntil(r);
+  const dp=DISHPICS[dishSlug(r.n)];
+  return `<article class="dish${isHome(r)?" home":""}${dp?" has-pic":""}">${dp?`<img class="dishpic" src="img/dish_${dishSlug(r.n)}.webp" alt="${esc(r.n)}" loading="lazy">`:""}<div class="dish-body"><div class="dish-h"><h4>${esc(r.n)}${isHome(r)?` <span class="fav">Local favourite</span>`:""}</h4><span class="pill ${u===0?"now":"later"}">${u===0?"In season":u<99?"From "+MONTHS[mAt(u)-1]:"Other regions"}</span></div>
+  <p>${esc(r.d)}</p>${r.w?`<div class="warnline">${esc(r.w)}</div>`:""}
+  <div class="dish-f"><span class="uses">${rPlants(r).map(p=>`<button data-open="${p.id}">${esc(p.name)}</button>`).join("")}</span><a class="ytlink" href="${ytURL(r.yt)}" target="_blank" rel="noopener">▶ Recipe video</a></div>${dp?`<div class="dishcred">Photo: ${esc(dp.a)} · ${esc(dp.l)} · <a href="${esc(dp.s)}" target="_blank" rel="noopener">source</a></div>`:""}</div></article>`}
+let courseObs;
+function watchCourses(){if(courseObs)courseObs.disconnect();if(!("IntersectionObserver" in window))return;
+ courseObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const k=e.target.id.replace("course-","");document.querySelectorAll(".course-nav a").forEach(a=>{const on=a.dataset.jump===k;a.classList.toggle("on",on);if(on)a.scrollIntoView({block:"nearest",inline:"nearest"})})}})},{rootMargin:"-130px 0px -60% 0px"});
+ document.querySelectorAll(".course").forEach(c=>courseObs.observe(c))}
+function renderMenu(){
+  const scope=state.menu||"local";
+  const pick=r=>scope==="all"?true:scope==="now"?rUntil(r)===0:rUntil(r)<99;
+  const list=R.filter(pick);
+  const nowN=R.filter(r=>rUntil(r)===0).length, locN=R.filter(r=>rUntil(r)<99).length;
+  $("#v-menu").innerHTML=`
+  <div class="menu-head"><div class="eyebrow">Forage to Table</div><h2>The ${esc(state.st)} menu</h2>
+   <p>Every dish here starts with something wild. ${R.filter(isHome).length} are ${esc(state.st)} favourites, listed first. ${nowN} of ${locN} dishes you can make here use what's in season in ${MONTHS[state.m-1]}.</p></div>
+  <div class="controls" style="justify-content:center">
+   <div class="seg" role="group" aria-label="Menu scope"><button data-menu="now" aria-pressed="${scope==="now"}">In season now</button><button data-menu="local" aria-pressed="${scope==="local"}">My region</button><button data-menu="all" aria-pressed="${scope==="all"}">All India</button></div>
+  </div>
+  <nav class="course-nav">${COURSES.map(([k,v])=>`<a href="#menu" data-jump="${k}">${v}</a>`).join("")}</nav>
+  ${COURSES.map(([k,v])=>{const items=list.filter(r=>r.c===k).sort((a,b)=>(homeScore(b)-homeScore(a))||(rUntil(a)===0?0:1)-(rUntil(b)===0?0:1)||rUntil(a)-rUntil(b)||a.n.localeCompare(b.n));
+    return `<section class="course" id="course-${k}"><h3><span>${v}</span></h3>${items.length?`<div class="dishes">${items.map(menuItem).join("")}</div>`:`<div class="empty">Nothing on this course ${scope==="now"?"this month":"for your region"}. Try <b>All India</b>.</div>`}</section>`}).join("")}`;
+  watchCourses();
+}
+
+function renderSafety(){
+  $("#v-safety").innerHTML=`
+  <div class="intro"><div><h2>Stay safe</h2><p>Most foraging accidents come from a confident wrong identification. These rules and plants apply anywhere in India.</p></div></div>
+  <div class="panel"><h3>Golden rules</h3><ol class="rules">
+   <li><span><b>100% sure or don't eat it.</b> Check the leaf, stem, flower, smell and sap. If one feature is off, leave it.</span></li>
+   <li><span><b>Learn from locals.</b> Village elders, vegetable sellers and tribal foragers know the lookalikes.</span></li>
+   <li><span><b>Try one new food at a time,</b> a small cooked portion, then wait a day.</span></li>
+   <li><span><b>Avoid pollution:</b> busy roadsides, drains, sewage-fed lakes, railway lines, sprayed fields.</span></li>
+   <li><span><b>Stay out of protected areas.</b> National parks, tiger reserves and sanctuaries ban collecting, and reserve forests need Forest Department permission.</span></li>
+   <li><span><b>Ask before picking</b> on private land. Fruit trees nearly always have an owner.</span></li>
+   <li><span><b>Take a third or less</b> of a patch, and never uproot rare plants.</span></li>
+  </ol></div>
+  <h3 class="section-h">Never eat these</h3>
+  <div class="danger-grid">${DANGER.map(([n,l,d])=>`<div class="panel danger"><h3>${n}</h3><div class="local" style="color:var(--muted);font-size:.85rem">${l}</div><p style="margin-top:6px">${d}</p></div>`).join("")}</div>
+  <h3 class="section-h">Lookalikes to know</h3>
+  <p style="color:var(--muted);margin:-4px 0 10px">The edible plant is on the left and its dangerous double on the right.</p>
+  <div class="lk-grid">${LOOK.map(l=>{const p=P.find(x=>x.id===l.p[0]);return `<div class="panel">${lookBlock(p,l)}<div class="uses" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${l.p.map(id=>{const q=P.find(x=>x.id===id);return `<button class="chip" data-open="${id}">${esc(q.name)}</button>`}).join("")}</div></div>`}).join("")}</div>
+  <h3 class="section-h">Plants that need preparing first</h3>
+  <div class="list">${P.filter(p=>p.warn).map(p=>`<button class="row" data-open="${p.id}"><span><b>${esc(p.name)}</b><br><span class="why">${esc(p.warn)}</span></span></button>`).join("")}</div>`;
+}
+
+function openSheet(id){
+  const p=P.find(x=>x.id===id);if(!p)return;
+  const ms=p.methods.map(m=>METHODS.find(x=>x.id===m)?.name).filter(Boolean);
+  $("#sheet-root").innerHTML=`<div class="sheet-bg" id="sbg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
+   <header><div>${tag(p)}<h2 id="sh-t" style="margin-top:8px">${esc(p.name)}</h2><div class="sci">${esc(p.sci)}</div><div class="local" style="color:var(--muted)">${esc(p.local)}</div></div><button class="close" id="sclose" aria-label="Close">✕</button></header>
+   ${galleryHTML(p)}
+   <div class="photo-links">${CREDITS[p.id]?"":`<a class="btn ghost" href="${photoURL(p)}" target="_blank" rel="noopener">See photos</a>`}<a class="btn primary" href="${ytURL("how to harvest "+p.name+" "+p.local.split(" · ")[0])}" target="_blank" rel="noopener">Watch how to harvest</a><a class="btn primary" href="${ytURL(YT[p.id]||p.name+" recipe")}" target="_blank" rel="noopener">Watch how to prepare</a><a class="btn ghost" href="${wikiURL(p)}" target="_blank" rel="noopener">Read on Wikipedia</a></div>
+   <div class="facts">
+    ${p.warn?`<div class="callout"><b>Caution.</b> ${esc(p.warn)}</div>`:""}
+    ${lookFor(p).map(l=>lookBlock(p,l)).join("")}
+    <div><h4>How to recognise it</h4><p>${esc(p.note)}</p></div>
+    <div><h4>Season</h4>${strip(p)}</div>
+    <div><h4>Where in India</h4><p>${p.regions.map(r=>REGION_NAMES[r]).join(" · ")}${inRegion(p)?"":` <b>(not usually in ${esc(state.st)})</b>`}</p></div>
+    ${p.nutr.length?`<div><h4>Good for</h4><p>${p.nutr.map(k=>NUTR[k].name).join(" · ")}</p></div>`:""}
+    <div><h4>How to harvest</h4><p>${esc(harvestText(p))}</p></div>
+    <div><h4>How to eat it</h4><p>${esc(p.eat)}</p></div>
+    ${(()=>{const rs=R.filter(r=>r.u.includes(p.id));return rs.length?`<div><h4>On the menu</h4><p>${rs.map(r=>`<b>${esc(r.n)}</b> · <a href="${ytURL(r.yt)}" target="_blank" rel="noopener">video</a>`).join("<br>")}</p></div>`:""})()}
+    <div><h4>How to store it</h4><p>${esc(p.store)}</p></div>
+   </div></div></div>`;
+  const close=()=>{$("#sheet-root").innerHTML="";document.removeEventListener("keydown",esc_)};
+  const esc_=e=>{if(e.key==="Escape")close()};
+  $("#sclose").onclick=close;$("#sbg").onclick=e=>{if(e.target.id==="sbg")close()};
+  document.addEventListener("keydown",esc_);$("#sclose").focus();
+}
+
+const VIEWS=["near","menu","nutrition","safety"];
+function route(){
+  const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):"near";
+  $("#sheet-root").innerHTML="";
+  const was=VIEWS.find(x=>!$("#v-"+x).hidden);
+  VIEWS.forEach(x=>{$("#v-"+x).hidden=x!==v});
+  if(was&&was!==v)window.scrollTo({top:0});
+  document.querySelectorAll("nav.tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+v?"page":"false"));
+}
+function renderTip(){$("#tip-root").innerHTML=fundHTML()}
+function renderAll(){renderTip();renderNear();renderNutrition();renderMenu();renderSafety();route()}
+
+const ss=$("#state");Object.keys(STATES).forEach(s=>ss.add(new Option(s,s,false,s===state.st)));
+const ms=$("#month");MONTHS.forEach((m,i)=>ms.add(new Option(m,i+1,false,i+1===state.m)));
+ss.onchange=e=>{state.st=e.target.value;store.set("fi-state",state.st);renderAll()};
+ms.onchange=e=>{state.m=+e.target.value;renderAll()};
+document.addEventListener("click",e=>{
+  const g=e.target.closest("[data-gsrc]");if(g){const h=document.getElementById("heroimg");if(h){h.src=g.dataset.gsrc;document.getElementById("herocap").innerHTML=g.dataset.gcap;document.querySelectorAll(".tb").forEach(t=>t.classList.toggle("on",t===g))}return}
+  if(e.target.id==="copyupi"){const t=TIP.upiId;const done=()=>{e.target.textContent="Copied"};navigator.clipboard?.writeText(t).then(done,()=>{const r=document.createRange();r.selectNodeContents($("#upi"));const sel=getSelection();sel.removeAllRanges();sel.addRange(r)});return}
+  const o=e.target.closest("[data-open]");if(o){openSheet(o.dataset.open);return}
+  const t=e.target.closest("[data-type]");if(t){state.type=t.dataset.type;renderNearList();return}
+  const m=e.target.closest("[data-mode]");if(m){state.mode=m.dataset.mode;renderNearList();return}
+  const mm=e.target.closest("[data-menu]");if(mm){state.menu=mm.dataset.menu;renderMenu();return}
+  const jp=e.target.closest("[data-jump]");if(jp){e.preventDefault();document.getElementById("course-"+jp.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
+  const n=e.target.closest("[data-nutr]");if(n){state.nutr=n.dataset.nutr;renderNutrition()}
+});
+addEventListener("hashchange",route);
+renderAll();
+</script>
+
+<script>
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}))}
+</script>
+</body>
+</html>
