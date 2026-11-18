@@ -272,6 +272,27 @@ main{padding-block:16px 56px}
 .install{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;margin-top:32px;padding:20px;border-radius:16px;border:1px solid var(--line);background:var(--sunk)}
 .install h3{font-size:1.2rem;margin-bottom:4px}.install p{margin:0;color:var(--muted)}
 .install .hint{font-size:.85rem;margin-top:6px}
+.menu-head2{display:flex;justify-content:space-between;align-items:end;gap:14px;flex-wrap:wrap;margin:8px 0 6px}
+.menu-head2 .eyebrow{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;font-weight:700;color:var(--green)}
+.menu-head2 h2{font-size:clamp(1.6rem,5vw,2.3rem);letter-spacing:-.02em;margin:4px 0}
+.menu-head2 p{margin:0;color:var(--muted)}
+.crow{margin-top:26px;scroll-margin-top:76px}
+.crow-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+.crow-h h3{font-size:1.2rem}.crow-h h3 span{color:var(--muted);font-family:var(--body);font-weight:400;font-size:.9rem;margin-left:4px}
+.seeall{border:0;background:none;font-weight:700;color:var(--fg);cursor:pointer;font-size:.9rem;padding:4px 0}
+.cscroll{display:flex;align-items:flex-start;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px;scrollbar-width:none;margin-right:calc(-1 * max(16px,env(safe-area-inset-right,0px)))}
+.cscroll::-webkit-scrollbar{display:none}
+.cscroll .dcard{flex:none;width:168px;scroll-snap-align:start}
+.cgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px}
+.dcard{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;align-self:flex-start;border:0;background:none;padding:0;text-align:left;cursor:pointer;color:var(--fg);min-width:0}
+.dimg{position:relative;display:block;width:100%;aspect-ratio:1;border-radius:16px;overflow:hidden;background:var(--sunk)}
+.dimg img{display:block;width:100%;height:100%;object-fit:cover}
+.dimg.ing img{filter:saturate(.85)}
+.noimg{display:grid;place-items:center;width:100%;height:100%;font-family:var(--display);font-size:3rem;font-weight:700;color:var(--green);background:var(--green-soft)}
+.favtag{position:absolute;left:8px;top:8px;background:rgba(0,0,0,.62);color:#fff;font-size:.62rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:3px 7px;border-radius:999px}
+.dcard b{display:block;font-family:var(--display);font-size:.98rem;line-height:1.2;margin-top:7px}
+.dmeta{display:block;font-size:.78rem;color:var(--muted);margin-top:2px}.dmeta.now{color:var(--green);font-weight:700}
+@media (min-width:900px){.cscroll .dcard{width:200px}}
 footer{color:var(--muted);font-size:.85rem;padding-block:24px;border-top:1px solid var(--line)}
 @media (prefers-reduced-motion:no-preference){.card,.row,.chip{transition:border-color .15s,background .15s}}
 </style>
@@ -796,30 +817,39 @@ const isHome=r=>r.h.some(x=>regionsOf().includes(x));
 const homeScore=r=>{const rg=regionsOf();if(!r.h.length)return 0;const own=r.h[0]===rg[0]?3:r.h.includes(rg[0])?2:r.h.some(x=>rg.includes(x))?1:0;return own};
 const rPlants=r=>r.u.map(id=>P.find(p=>p.id===id)).filter(Boolean);
 const rUntil=r=>{const l=rPlants(r).filter(inRegion);return l.length?Math.min(...l.map(untilMonths)):99};
-function menuItem(r){const u=rUntil(r);
-  const dp=DISHPICS[dishSlug(r.n)];
-  return `<article class="dish${isHome(r)?" home":""}${dp?" has-pic":""}">${dp?`<img class="dishpic" src="img/dish_${dishSlug(r.n)}.webp" alt="${esc(r.n)}" loading="lazy">`:""}<div class="dish-body"><div class="dish-h"><h4>${esc(r.n)}${isHome(r)?` <span class="fav">Local favourite</span>`:""}</h4><span class="pill ${u===0?"now":"later"}">${u===0?"In season":u<99?"From "+MONTHS[mAt(u)-1]:"Other regions"}</span></div>
-  <p>${esc(r.d)}</p>${r.w?`<div class="warnline">${esc(r.w)}</div>`:""}
-  <div class="dish-f"><span class="uses">${rPlants(r).slice(0,2).map(p=>`<button data-open="${p.id}">${esc(p.name)}</button>`).join("")}</span><a class="ytlink" href="${ytURL(r.yt)}" target="_blank" rel="noopener">▶ Recipe video</a></div>${dp?`<div class="dishcred">Photo: ${esc(dp.a)} · ${esc(dp.l)} · <a href="${esc(dp.s)}" target="_blank" rel="noopener">source</a></div>`:""}</div></article>`}
-let courseObs;
-function watchCourses(){if(courseObs)courseObs.disconnect();if(!("IntersectionObserver" in window))return;
- courseObs=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){const k=e.target.id.replace("course-","");document.querySelectorAll(".course-nav a").forEach(a=>{const on=a.dataset.jump===k;a.classList.toggle("on",on);if(on)a.scrollIntoView({block:"nearest",inline:"nearest"})})}})},{rootMargin:"-130px 0px -60% 0px"});
- document.querySelectorAll(".course").forEach(c=>courseObs.observe(c))}
+const dishImg=r=>{const sl=dishSlug(r.n);if(DISHPICS[sl])return {src:`img/dish_${sl}.webp`,dish:true};const pl=rPlants(r).find(p=>CREDITS[p.id]);return pl?{src:`img/${pl.id}.webp`,dish:false}:null};
+const seasonTxt=r=>{const u=rUntil(r);return u===0?"In season":u<99?"From "+MONTHS[mAt(u)-1]:"Other regions"};
+function dishCard(r){const im=dishImg(r),u=rUntil(r),i=R.indexOf(r);
+  return `<button class="dcard" data-dish="${i}"><span class="dimg${im&&!im.dish?" ing":""}">${im?`<img src="${im.src}" alt="" loading="lazy">`:`<span class="noimg">${esc(r.n.charAt(0))}</span>`}</span>
+  <b>${esc(r.n)}</b><span class="dmeta ${u===0?"now":""}">${seasonTxt(r)}</span></button>`}
+function openDish(i){const r=R[i];if(!r)return;const im=dishImg(r),sl=dishSlug(r.n),dp=DISHPICS[sl];
+  $("#sheet-root").innerHTML=`<div class="sheet-bg" id="sbg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
+   <header><div><span class="tag t-${r.c==="drink"?"fruit":"green"}">${COURSES.find(c=>c[0]===r.c)[1]}</span><h2 id="sh-t" style="margin-top:8px">${esc(r.n)}</h2>${isHome(r)?`<div class="fav" style="margin:4px 0 0">${esc(state.st)} favourite</div>`:""}</div><button class="close" id="sclose" aria-label="Close">✕</button></header>
+   ${im?`<figure class="hero"><img class="heroimg" src="${im.src}" alt="${esc(r.n)}">${dp?`<figcaption>Photo: ${esc(dp.a)} · ${esc(dp.l)} · <a href="${esc(dp.s)}" target="_blank" rel="noopener">source</a></figcaption>`:`<figcaption>Shown: the wild ingredient</figcaption>`}</figure>`:""}
+   <div class="photo-links"><a class="btn primary" href="${ytURL(r.yt)}" target="_blank" rel="noopener">▶ Watch the recipe</a></div>
+   <div class="facts">
+    ${r.w?`<div class="callout"><b>Note.</b> ${esc(r.w)}</div>`:""}
+    <div><h4>How to make it</h4><p>${esc(r.d)}</p></div>
+    <div><h4>Season</h4><p>${seasonTxt(r)}</p></div>
+    <div><h4>Wild ingredients</h4><div class="uses" style="display:flex;flex-wrap:wrap;gap:6px">${rPlants(r).map(p=>`<button class="chip" data-open="${p.id}">${esc(p.name)}</button>`).join("")}</div></div>
+   </div></div></div>`;
+  const close=()=>{$("#sheet-root").innerHTML="";document.removeEventListener("keydown",k)};const k=e=>{if(e.key==="Escape")close()};
+  $("#sclose").onclick=close;$("#sbg").onclick=e=>{if(e.target.id==="sbg")close()};document.addEventListener("keydown",k);$("#sclose").focus();
+}
 function renderMenu(){
   const scope=state.menu||"now"; state.open=state.open||{};
   const pick=r=>scope==="all"?true:scope==="now"?rUntil(r)===0:rUntil(r)<99;
   const list=R.filter(pick);
   const nowN=R.filter(r=>rUntil(r)===0).length, locN=R.filter(r=>rUntil(r)<99).length;
   $("#v-menu").innerHTML=`
-  <div class="menu-head"><div class="eyebrow">Forage to Table</div><h2>The ${esc(state.st)} menu</h2>
-   <p>Every dish starts with something wild. ${esc(state.st)} favourites come first, and ${nowN} of the ${locN} dishes you can make here are in season in ${MONTHS[state.m-1]}.</p></div>
-  <div class="controls" style="justify-content:center">
-   <div class="seg" role="group" aria-label="Menu scope"><button data-menu="now" aria-pressed="${scope==="now"}">In season now</button><button data-menu="local" aria-pressed="${scope==="local"}">My region</button><button data-menu="all" aria-pressed="${scope==="all"}">All India</button></div>
-  </div>
-  <nav class="course-nav">${COURSES.map(([k,v])=>`<a href="#menu" data-jump="${k}">${v}</a>`).join("")}</nav>
-  ${COURSES.map(([k,v])=>{const items=list.filter(r=>r.c===k).sort((a,b)=>(homeScore(b)-homeScore(a))||(rUntil(a)===0?0:1)-(rUntil(b)===0?0:1)||rUntil(a)-rUntil(b)||a.n.localeCompare(b.n));
-    return `<section class="course" id="course-${k}"><h3><span>${v}</span></h3>${items.length?`<div class="dishes">${(state.open[k]?items:items.slice(0,5)).map(menuItem).join("")}</div>${items.length>5?`<button class="more" data-more="${k}">${state.open[k]?"Show fewer":`Show all ${items.length}`}</button>`:""}`:`<div class="empty">Nothing on this course ${scope==="now"?"this month":"for your region"}. Try ${scope==="now"?"<b>My region</b>":"<b>All India</b>"}.</div>`}</section>`}).join("")}`;
-  watchCourses();
+  <div class="menu-head2"><div><div class="eyebrow">Forage to Table</div><h2>The ${esc(state.st)} menu</h2>
+   <p>${nowN} of ${locN} local dishes are in season in ${MONTHS[state.m-1]}.</p></div>
+   <div class="seg" role="group" aria-label="Menu scope"><button data-menu="now" aria-pressed="${scope==="now"}">In season</button><button data-menu="local" aria-pressed="${scope==="local"}">My region</button><button data-menu="all" aria-pressed="${scope==="all"}">All India</button></div></div>
+  ${COURSES.map(([k,v])=>{const items=list.filter(r=>r.c===k).sort((a,b)=>(homeScore(b)-homeScore(a))||(rUntil(a)===0?0:1)-(rUntil(b)===0?0:1)||rUntil(a)-rUntil(b)||(!!DISHPICS[dishSlug(b.n)]-!!DISHPICS[dishSlug(a.n)])||a.n.localeCompare(b.n));
+    if(!items.length)return "";
+    const open=state.open[k];
+    return `<section class="crow" id="course-${k}"><div class="crow-h"><h3>${v} <span>${items.length}</span></h3>${items.length>2?`<button class="seeall" data-more="${k}">${open?"Show less":"See all →"}</button>`:""}</div>
+    <div class="${open?"cgrid":"cscroll"}">${items.map(dishCard).join("")}</div></section>`}).join("")||`<div class="empty">Nothing in season here this month. Try <b>My region</b>.</div>`}`;
 }
 
 function renderSafety(){
@@ -890,7 +920,8 @@ document.addEventListener("click",e=>{
   const o=e.target.closest("[data-open]");if(o){openSheet(o.dataset.open);return}
   const t=e.target.closest("[data-type]");if(t){state.type=t.dataset.type;renderNearList();return}
   const m=e.target.closest("[data-mode]");if(m){state.mode=m.dataset.mode;renderNearList();return}
-  const mo=e.target.closest("[data-more]");if(mo){state.open=state.open||{};const k=mo.dataset.more;state.open[k]=!state.open[k];const y=document.getElementById("course-"+k).getBoundingClientRect().top;renderMenu();if(!state.open[k])document.getElementById("course-"+k).scrollIntoView({block:"start"});return}
+  const dc=e.target.closest("[data-dish]");if(dc){openDish(+dc.dataset.dish);return}
+  const mo=e.target.closest("[data-more]");if(mo){state.open=state.open||{};const k=mo.dataset.more;state.open[k]=!state.open[k];renderMenu();document.getElementById("course-"+k).scrollIntoView({block:"start"});return}
   const mm=e.target.closest("[data-menu]");if(mm){state.menu=mm.dataset.menu;renderMenu();return}
   const jp=e.target.closest("[data-jump]");if(jp){e.preventDefault();document.getElementById("course-"+jp.dataset.jump)?.scrollIntoView({behavior:"smooth",block:"start"});return}
   const n=e.target.closest("[data-nutr]");if(n){state.nutr=n.dataset.nutr;renderNutrition()}
