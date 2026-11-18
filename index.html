@@ -309,7 +309,7 @@ footer{color:var(--muted);font-size:.85rem;padding-block:24px;border-top:1px sol
 
 <header class="bar">
   <div class="wrap bar-row">
-    <a class="brand" href="#home" aria-label="Forage India home"><span class="logo"><img src="img/logo-f.png" alt="" width="34" height="34"></span><h1>Forage <span>India</span></h1></a>
+    <a class="brand" href="./" aria-label="Forage India home"><span class="logo"><img src="img/logo-f.png" alt="" width="34" height="34"></span><h1>Forage <span>India</span></h1></a>
     <nav class="tabs" aria-label="Sections">
       <a href="#near"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg><span>Near you</span></a><a href="#menu"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h18a9 9 0 0 1-18 0z"/><path d="M8 8c0-2 2-2 2-4M12 8c0-2 2-2 2-4M16 8c0-2 2-2 2-4"/></svg><span>Menu</span></a><a href="#nutrition"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19C5 10 11 5 20 4c-1 9-6 15-15 15z"/><path d="M5 19l8-8"/></svg><span>Nutrition</span></a><a href="#safety"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg><span>Stay safe</span></a>
     </nav>
@@ -921,6 +921,8 @@ function route(){
   if(was&&was!==v)window.scrollTo({top:0});
   document.querySelectorAll("nav.tabs a").forEach(a=>a.setAttribute("aria-current",a.getAttribute("href")==="#"+v?"page":"false"));
 }
+document.querySelector("a.brand").addEventListener("click",e=>{e.preventDefault();if(location.hash)history.pushState(null,"",location.pathname+location.search);route()});
+addEventListener("popstate",route);
 function renderTip(){$("#tip-root").innerHTML=fundHTML()}
 function renderAll(){renderTip();renderHome();renderNear();renderNutrition();renderMenu();renderSafety();route()}
 
