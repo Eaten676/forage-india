@@ -664,7 +664,8 @@ function renderHome(){
   const plantsNow=now.filter(p=>p.type!=="protein");
   const pics=plantsNow.filter(p=>CREDITS[p.id]).slice(0,8);
   const names=plantsNow.slice(0,3).map(p=>p.name.toLowerCase());
-  const dishes=R.filter(r=>rUntil(r)===0).sort((a,b)=>(!!DISHPICS[dishSlug(b.n)]-!!DISHPICS[dishSlug(a.n)])||(homeScore(b)-homeScore(a))).slice(0,3);
+  const pic=r=>DISHPICS[dishSlug(r.n)]?2:YTV[dishSlug(r.n)]?1:0;
+  const dishes=COURSES.map(([c])=>R.filter(r=>r.c===c&&rUntil(r)===0).sort((a,b)=>(homeScore(b)-homeScore(a))||(pic(b)-pic(a)))[0]).filter(Boolean);
   const ios=/iphone|ipad|ipod/i.test(navigator.userAgent);
   $("#v-home").innerHTML=`
   <section class="hero">
@@ -680,7 +681,7 @@ function renderHome(){
    <a href="#menu" class="promise"><b>Cook</b><span>A Forage to Table menu, from drinks to desserts.</span></a>
   </section>
   ${dishes.length?`<section class="tonight"><div class="row-h"><h3>Tonight's forage to table</h3><a href="#menu">Full menu</a></div>
-   <div class="tonight-grid">${dishes.map(r=>{const sl=dishSlug(r.n),pl=rPlants(r).find(p=>CREDITS[p.id]);const src=DISHPICS[sl]?`img/dish_${sl}.webp`:pl?`img/${pl.id}.webp`:"";return `<a class="t-card" href="#menu">${src?`<img src="${src}" alt="" loading="lazy">`:""}<b>${esc(r.n)}</b><span>${esc(rPlants(r).slice(0,2).map(p=>p.name).join(" · "))}</span></a>`}).join("")}</div></section>`:""}
+   <div class="cscroll">${dishes.map(r=>dishCard(r,COURSES.find(c=>c[0]===r.c)[1])).join("")}</div></section>`:""}
   <section class="install">
    <div><h3>Take it into the forest</h3><p>Add Forage India to your home screen. It works offline, with no signal needed.</p></div>
    <div><button class="btn primary" id="installbtn" ${deferredInstall?"":"hidden"}>Add to home screen</button>
@@ -840,9 +841,9 @@ const dishImg=r=>{const sl=dishSlug(r.n),fb=ingImg(r);if(DISHPICS[sl])return {sr
   if(YTV[sl])return {src:`https://i.ytimg.com/vi/${YTV[sl].id}/mqdefault.jpg`,dish:true,yt:true,fb};return fb?{src:fb,dish:false}:null};
 const imgFail=el=>{const f=el.dataset.fb;el.onerror=null;if(f){el.src=f;el.parentNode.classList.add("ing");el.parentNode.classList.remove("vid")}else el.remove()};
 const seasonTxt=r=>{const u=rUntil(r);return u===0?"In season":u<99?"From "+MONTHS[mAt(u)-1]:"Other regions"};
-function dishCard(r){const im=dishImg(r),u=rUntil(r),i=R.indexOf(r);
+function dishCard(r,label){const im=dishImg(r),u=rUntil(r),i=R.indexOf(r);
   return `<button class="dcard" data-dish="${i}"><span class="dimg${im&&!im.dish?" ing":""}${im&&im.yt?" vid":""}">${im?`<img src="${im.src}" alt="" loading="lazy"${im.yt?` data-fb="${im.fb}" onerror="imgFail(this)"`:""}>`:`<span class="noimg">${esc(r.n.charAt(0))}</span>`}</span>
-  <b>${esc(r.n)}</b><span class="dmeta ${u===0?"now":""}">${seasonTxt(r)}</span></button>`}
+  <b>${esc(r.n)}</b><span class="dmeta ${!label&&u===0?"now":""}">${label?esc(label):seasonTxt(r)}</span></button>`}
 function openDish(i){const r=R[i];if(!r)return;const im=dishImg(r),sl=dishSlug(r.n),dp=DISHPICS[sl],yv=YTV[sl];
   $("#sheet-root").innerHTML=`<div class="sheet-bg" id="sbg"><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-t">
    <header><div><span class="tag t-${r.c==="drink"?"fruit":"green"}">${COURSES.find(c=>c[0]===r.c)[1]}</span><h2 id="sh-t" style="margin-top:8px">${esc(r.n)}</h2>${isHome(r)?`<div class="fav" style="margin:4px 0 0">${esc(state.st)} favourite</div>`:""}</div><button class="close" id="sclose" aria-label="Close">✕</button></header>
